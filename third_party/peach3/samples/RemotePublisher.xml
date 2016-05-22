@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+	
+	<!--
+		
+		Example of the WindowsDebugger monitor.  This example will launch a 
+		program with an attached debugger and log stack traces on faults.  The
+		included example program will fault on test 47.
+		
+		Syntax:
+		
+		Run this on remote machine:
+			peach -a tcp
+		
+		Run this on local machine:
+			peach samples\Debugger.xml
+		
+		Output:
+		
+		You will see the tests scroll along.  Once test 47 has occured you can check
+		the "logs" folder for a log of this test that will include debugger output.
+		
+		Authors:
+		
+		Michael Eddington (mike@dejavusecurity.com)
+		
+	-->
+	
+	<DataModel name="TestTemplate">
+		<String name="TheString" value="Hello World!" />
+	</DataModel>
+	
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+			<Action type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+		</State>
+	</StateModel>
+	
+	<Agent name="RemoteAgent" location="tcp://127.0.0.1:9001"> 
+		<!-- This agent will get our remote publisher -->
+		
+		<!-- Load up our target -->
+		<Monitor class="WindowsDebugger">
+			<Param name="CommandLine" value="CrashableServer.exe 127.0.0.1 4242" />
+		</Monitor>
+	</Agent>
+	
+	<Test name="Default">
+		<Agent ref="RemoteAgent" />
+		
+		<StateModel ref="State"/>
+		<Publisher class="RemotePublisher">
+			<Param name="Agent" value="RemoteAgent" />
+			<Param name="Class" value="Tcp"/>
+			<Param name="Host" value="127.0.0.1" />
+			<Param name="Port" value="4242" />
+		</Publisher>
+		
+		<Logger class="Filesystem">
+			<Param name="Path" value="logs" />
+		</Logger>
+	</Test>
+
+</Peach>
+<!-- end -->

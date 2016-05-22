@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach /peach/peach.xsd">
+
+	<DataModel name="Chunk">
+		<String name="ID" length="4" padCharacter=" " />
+		<Number name="Size" size="32" signed="false">
+			<Relation type="size" of="Data"/>
+		</Number>
+		<Blob name="Data" />
+		<Blob name="Pad" length="1" lengthType="bits" />
+	</DataModel>
+
+	<DataModel name="ChunkFmt" ref="Chunk">
+		<String name="ID" value="fmt " token="true"/>
+		<Block name="Data">
+			<Number name="CompressionCode" size="16" signed="false"/>
+			<Number name="NumberOfChannels" size="16" signed="false"/>
+			<Number name="SampleRate" size="32" signed="false"/>
+			<Number name="AverageBytesPerSecond" size="32" signed="false"/>
+			<Number name="BlockAlign" size="16" signed="false"/>
+			<Number name="SignificantBitsPerSample" size="16" signed="false"/>
+			<Number name="ExtraFormatBytes" size="16" signed="false"/>
+			<Blob name="ExtraData" />
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkData" ref="Chunk">
+		<String name="ID" value="data" token="true"/>
+	</DataModel>
+
+	<DataModel name="ChunkFact" ref="Chunk">
+		<String name="ID" value="fact" token="true"/>
+		<Block name="Data">
+			<Number size="32" signed="false"/>
+			<Blob/>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkSint" ref="Chunk">
+		<String name="ID" value="sInt" token="true"/>
+		<Block name="Data">
+			<Number size="32" signed="false"/>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkWavl" ref="Chunk">
+		<String name="ID" value="wavl" token="true"/>
+		<Block name="Data">
+			<Block name="ArrayOfChunks" maxOccurs="3000">
+				<Block ref="ChunkSint"/>
+				<Block ref="ChunkData" />
+			</Block>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkCue" ref="Chunk">
+		<String name="ID" value="cue " token="true"/>
+		<Block name="Data">
+			<Block name="ArrayOfCues" maxOccurs="3000">
+				<String length="4" />
+				<Number size="32" signed="false"/>
+				<String length="4" />
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+			</Block>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkPlst" ref="Chunk">
+		<String name="ID" value="plst" token="true"/>
+		<Block name="Data">
+			<Number name="NumberOfSegments" size="32" signed="false">
+				<Relation type="count" of="ArrayOfSegments"/>
+			</Number>
+			<Block name="ArrayOfSegments" maxOccurs="3000">
+				<String length="4" />
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+			</Block>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkLabl" ref="Chunk">
+		<String name="ID" value="labl" token="true"/>
+		<Block name="Data">
+			<Number size="32" signed="false"/>
+			<String nullTerminated="true" />
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkNote" ref="ChunkLabl">
+		<String name="ID" value="note" token="true"/>
+	</DataModel>
+
+	<DataModel name="ChunkLtxt" ref="Chunk">
+		<String name="ID" value="ltxt" token="true"/>
+		<Block name="Data">
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="16" signed="false"/>
+			<Number size="16" signed="false"/>
+			<Number size="16" signed="false"/>
+			<Number size="16" signed="false"/>
+			<String nullTerminated="true" />
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkList" ref="Chunk">
+		<String name="ID" value="list" token="true"/>
+		<Block name="Data">
+			<String value="adtl" token="true" />
+			<Choice maxOccurs="3000">
+				<Block ref="ChunkLabl"/>
+				<Block ref="ChunkNote"/>
+				<Block ref="ChunkLtxt"/>
+				<Block ref="Chunk"/>
+			</Choice>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkSmpl" ref="Chunk">
+		<String name="ID" value="smpl" token="true"/>
+		<Block name="Data">
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Number size="32" signed="false"/>
+			<Block maxOccurs="3000">
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+				<Number size="32" signed="false"/>
+			</Block>
+		</Block>
+	</DataModel>
+
+	<DataModel name="ChunkInst" ref="Chunk">
+		<String name="ID" value="inst" token="true"/>
+		<Block name="Data">
+			<Number size="8"/>
+			<Number size="8"/>
+			<Number size="8"/>
+			<Number size="8"/>
+			<Number size="8"/>
+			<Number size="8"/>
+			<Number size="8"/>
+		</Block>
+	</DataModel>
+
+	<DataModel name="Wav">
+		<String value="RIFF" token="true" />
+		<Number size="32" signed="false"/>
+		<String value="WAVE" token="true"/>
+
+		<Choice maxOccurs="30000">
+			<Block ref="ChunkFmt"/>
+			<Block ref="ChunkData"/>
+			<Block ref="ChunkFact"/>
+			<Block ref="ChunkSint"/>
+			<Block ref="ChunkWavl"/>
+			<Block ref="ChunkCue"/>
+			<Block ref="ChunkPlst"/>
+			<Block ref="ChunkLtxt"/>
+			<Block ref="ChunkSmpl"/>
+			<Block ref="ChunkInst"/>
+			<Block ref="Chunk"/>
+		</Choice>
+	</DataModel>
+
+	<DataModel name="Param">
+		<String name="Value" isStatic="true" />
+	</DataModel>
+	
+	
+	<StateModel name="TheState" initialState="Initial">
+		<State name="Initial">
+			<Action type="output">
+				<DataModel ref="Wav" />
+				<Data name="data" fileName="/home/android/droid-ff/mutation_sample/sample.wav"/>
+			</Action>
+			<Action type="close"/>
+		</State>
+	</StateModel>
+	
+<!-- TODO: Configure Agent
+	<Agent name="Local">
+		<Monitor class="CrashWrangler">
+  			<Param name="Command" value="/Applications/VLC.app/Contents/MacOS/VLC"/>
+  			<Param name="Arguments" value="fuzzed.wav" />
+  			<Param name="UseDebugMalloc" value="false" />
+            <Param name="ExploitableReads" value="true" />
+  			<Param name="ExecHandler" value="./exc_handler" />
+		</Monitor>
+	</Agent>
+
+ -->
+	
+	<Test name="Default">
+		<Strategy class="Random"/>
+		<!--<Agent ref="Local" platform="osx"/>-->
+		<StateModel ref="TheState"/>
+		<Publisher class="FilePerIteration">
+   			<Param name="FileName" value="/home/android/droid-ff/generated_samples_folder/fuzzed_{0}.wav" />
+		</Publisher>
+	</Test>
+
+
+    <Run name="DefaultRun">
+      <Test ref="Default"/>
+		<Logger class="Filesystem">
+        	<Param name="Path" value="logs" />
+    	</Logger>
+    </Run>  
+
+
+</Peach>
+<!-- end -->

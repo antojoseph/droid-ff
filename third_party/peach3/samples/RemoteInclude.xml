@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+	
+	<!--
+		
+		Example of including a remote Peach DDL file.
+		
+		Syntax:
+		
+		peach samples\RemoteInclude.xml
+		
+		Output:
+		
+		Will display "Hello from peachfuzzer.com!"
+		
+		Authors:
+		Michael Eddington (mike@dejavusecurity.com)
+		
+	-->
+
+	<Include ns="example" src="http://peachfuzzer.com/Peach/Example.xml" />
+
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+			<Action type="output">
+				<DataModel ref="example:HelloWorldTemplate" />
+			</Action>
+		</State>
+	</StateModel>
+	
+	<Test name="Default">
+		<StateModel ref="State" />
+		<Publisher class="Console" />
+	</Test>
+	
+</Peach>
+<!-- end -->

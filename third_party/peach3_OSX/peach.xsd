@@ -1,0 +1,2982 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://peachfuzzer.com/2012/Peach" elementFormDefault="qualified"
+	xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<!--
+		
+		Copyright (c) 2007-2012 Michael Eddington
+		
+		Permission is hereby granted, free of charge, to any person obtaining a copy 
+		of this software and associated documentation files (the "Software"), to deal
+		in the Software without restriction, including without limitation the rights 
+		to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+		copies of the Software, and to permit persons to whom the Software is 
+		furnished to do so, subject to the following conditions:
+		
+		The above copyright notice and this permission notice shall be included in	
+		all copies or substantial portions of the Software.
+		
+		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+		IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+		FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+		AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+		LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+		OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+		SOFTWARE.
+		
+		Authors:
+		  Michael Eddington (mike@dejavusecurity.com)
+		
+		$Id$
+		
+	-->
+
+	<xs:element name="Peach">
+		<xs:annotation>
+			<xs:documentation>Root element of a Peach XML DDL document.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Ocl" />
+				<xs:element ref="PythonPath" />
+				<xs:element ref="Import" />
+				<xs:element ref="Include" />
+				<xs:element ref="Defaults" />
+				<xs:element ref="DataModel" />
+				<xs:element ref="Data" />
+				<xs:element ref="Test" />
+				<xs:element ref="Agent" />
+				<xs:element ref="StateModel" />
+				<!--<xs:element ref="Mutators"/>-->
+				<xs:element ref="Python" />
+				<xs:element ref="Analyzer" />
+			</xs:choice>
+			<xs:attribute name="version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Version of this XML file</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="author" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Author of this XML file</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="description" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Description of this XML file</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Ocl">
+		<xs:annotation>
+			<xs:documentation>
+				Provide OCL script inside of cdata.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="true">
+			<xs:attribute name="controlOnly" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Only use these OCL Contexts on Control or Record iterations./</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Python">
+		<xs:annotation>
+			<xs:documentation>
+				This element allows for running Python code.  This is useful to call any initialization methods for code
+				that is later used.  This is an advanced element.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="code" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Python code to run.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Defaults">
+		<xs:annotation>
+			<xs:documentation>This element allow setting default values for data elements.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Number" type="NumberDefaults" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="String" type="StringDefaults" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Flags"  type="FlagsDefaults"  minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Blob"   type="BlobDefaults"   minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DataModel" type="tTemplate">
+		<xs:annotation>
+			<xs:documentation>Templates are top level elements that contain other data elements. Templates
+				can be based on other Templates or Blocks using the ref attribute. Templates behave much
+				like Blocks. </xs:documentation>
+		</xs:annotation>
+		<xs:unique name="templateKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	
+	<xs:complexType name="tInclude">
+		<xs:attribute name="ref" />
+		<xs:attribute name="xpath"/>
+	</xs:complexType>
+	
+	<xs:complexType name="tExclude">
+		<xs:attribute name="ref" />
+		<xs:attribute name="xpath"/>
+	</xs:complexType>
+	
+	<xs:complexType name="tTemplate">
+		<xs:annotation>
+			<xs:documentation>
+				DataModels are top level elements that contain other data elements. DataModels
+				can be based on other DataModels or Blocks using the ref attribute. DataModels behave much
+				like Blocks.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="Relation" minOccurs="0" maxOccurs="unbounded" />
+			<xs:group ref="dataTypes" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="Transformer" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="Fixup" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="Hint" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="Placement" minOccurs="0" maxOccurs="1"/>
+		</xs:choice>
+		<xs:attributeGroup ref="peachCommonAttributes" />
+		<xs:attributeGroup ref="commonTemplateAttributes" />
+	</xs:complexType>
+
+	<xs:complexType name="NumberDefaults">
+		<xs:attribute name="endian">
+			<xs:annotation>
+				<xs:documentation>
+					Select byte order of little, network, or big.
+					Default is little.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="little" />
+					<xs:enumeration value="big" />
+					<xs:enumeration value="network" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="signed" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Is number signed. Defaults to true.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="valueType">
+			<xs:annotation>
+				<xs:documentation>Format of value attribute.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="string">
+						<xs:annotation>
+							<xs:documentation>
+								Regular string. C style &quot;\&quot; escaping can be used
+								such as: \r, \n, \t, and \\.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="literal">
+						<xs:annotation>
+							<xs:documentation>
+								Treated as a python literal string. An example is
+								&quot;[1,2,3,4]&quot; which would evaluate to a python
+								list.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="hex">
+						<xs:annotation>
+							<xs:documentation>Hex string. Allows specifying binary data.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="StringDefaults">
+		<xs:attribute name="lengthType" type="tLengthType">
+			<xs:annotation>
+				<xs:documentation>An optional attribute that specifies the value of length.  Default is bytes.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="padCharacter">
+			<xs:annotation>
+				<xs:documentation>
+					Specify the character to bad the string with if it's length if less then
+					specified in the length attribute. Only valid when the length attribute is also
+					specified.  This field will accept python escape sequences
+					such as \xNN, \r, \n, etc.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type">
+			<xs:annotation>
+				<xs:documentation>Specify type of string. Default is char.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="ascii">
+						<xs:annotation>
+							<xs:documentation>Single byte characters</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="utf16">
+						<xs:annotation>
+							<xs:documentation>
+								Double byte characters as commonly used with Windows
+								applications
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="utf16be">
+						<xs:annotation>
+							<xs:documentation>Multibyte unicode characters encoded in utf-16 big endian</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="utf32">
+						<xs:annotation>
+							<xs:documentation>Multibyte unicode characters encoded in utf-32</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="utf7">
+						<xs:annotation>
+							<xs:documentation>Multibyte unicode characters encoded in utf-7</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="utf8">
+						<xs:annotation>
+							<xs:documentation>Multibyte unicode characters encoded in utf-8</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="nullTerminated" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>
+					Indicate if string is null terminated. Default is
+					false.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="valueType">
+			<xs:annotation>
+				<xs:documentation>Format of value attribute.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="string">
+						<xs:annotation>
+							<xs:documentation>
+								Regular string. C style &quot;\&quot; escaping can be used
+								such as: \r, \n, \t, and \\.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="literal">
+						<xs:annotation>
+							<xs:documentation>
+								Treated as a python literal string. An example is
+								&quot;[1,2,3,4]&quot; which would evaluate to a python
+								list.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="hex">
+						<xs:annotation>
+							<xs:documentation>Hex string. Allows specifying binary data.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="FlagsDefaults">
+		<xs:attribute name="endian">
+			<xs:annotation>
+				<xs:documentation>
+					Select byte order of little, network, or big.
+					Default is little.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="little" />
+					<xs:enumeration value="big" />
+					<xs:enumeration value="network" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="size" type="xs:unsignedShort" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					Length in bits of this flag set. Valid values are 8, 16, 32, and
+					64.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="BlobDefaults">
+		<xs:attribute name="lengthType" type="tLengthType">
+			<xs:annotation>
+				<xs:documentation>An optional attribute that specifies the value of length.  Default is bytes.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="valueType">
+			<xs:annotation>
+				<xs:documentation>Format of value attribute.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="string">
+						<xs:annotation>
+							<xs:documentation>
+								Regular string. C style &quot;\&quot; escaping can be used
+								such as: \r, \n, \t, and \\.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="literal">
+						<xs:annotation>
+							<xs:documentation>
+								Treated as a python literal string. An example is
+								&quot;[1,2,3,4]&quot; which would evaluate to a python
+								list.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="hex">
+						<xs:annotation>
+							<xs:documentation>Hex string. Allows specifying binary data.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:element name="Block" type="tBlock">
+		<xs:annotation>
+			<xs:documentation>Blocks are combinations of other data elements combined in sequence to
+				produce a block of data. A block is similar to a c structure. Blocks can contain other
+				blocks, strings, numbers, etc.</xs:documentation>
+		</xs:annotation>
+		<xs:unique name="blockKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	
+	<xs:complexType name="tBlock">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="Block" minOccurs="0" />
+      <xs:element ref="Number" minOccurs="0" />
+			<xs:element ref="String" minOccurs="0" />
+			<xs:element ref="Flags" minOccurs="0" />
+      <xs:element ref="Flag" minOccurs="0" />
+			<xs:element ref="Blob" minOccurs="0" />
+			<xs:element ref="Padding" minOccurs="0" />
+			<xs:element ref="Seek" minOccurs="0" />
+			<xs:element ref="Choice" minOccurs="0" />
+			<xs:element ref="Custom" minOccurs="0" />
+			<xs:element ref="XmlElement" minOccurs="0" />
+			<xs:element ref="XmlAttribute" minOccurs="0" />
+			<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+		</xs:choice>
+		<xs:attributeGroup ref="peachCommonAttributes" />
+		<xs:attributeGroup ref="commonTemplateAttributes" />
+		<xs:attribute name="lengthType" type="tLengthType">
+			<xs:annotation>
+				<xs:documentation>An optional attribute that specifies the value of length.  Default is bytes.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="length" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>[Optional] Specify length of block.  Default is unbounded.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<xs:element name="Number">
+		<xs:annotation>
+			<xs:documentation>Represents a non-ascii integer that has a size in bits, and a byte
+			order.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="peachNumberAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attributeGroup ref="ValueAttributes" />
+			<xs:attribute name="token" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+		<xs:unique name="numberKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	
+	<xs:element name="Seek">
+		<xs:annotation>
+			<xs:documentation>Change our location in the input stream.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="relative" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Specify a location relative to our current one</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="position" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Specify a location relative to start of the input stream</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="expression" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>A python expression to calculate the position from start of input stream</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Choice">
+		<xs:annotation>
+			<xs:documentation>A choice will choose zero or more of the elements it contains based on
+				minOccurs and maxOccurs.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Block" minOccurs="0" />
+				<xs:element ref="Number" minOccurs="0" />
+				<xs:element ref="String" minOccurs="0" />
+				<xs:element ref="Flags" minOccurs="0" />
+				<xs:element ref="Blob" minOccurs="0" />
+				<xs:element ref="Padding" minOccurs="0" />
+				<xs:element ref="Seek" minOccurs="0" />
+				<xs:element ref="Choice" minOccurs="0" />
+				<xs:element ref="Custom" minOccurs="0" />
+				<xs:element ref="XmlElement" minOccurs="0" />
+				<xs:element ref="XmlAttribute" minOccurs="0" />
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="lengthType" type="tLengthType">
+				<xs:annotation>
+					<xs:documentation>An optional attribute that specifies the value of length.  Default is bytes.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="length" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>[Optional] Specify length of choice.  Default is unbounded.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+		<xs:unique name="ChoiceKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	
+	<xs:element name="XmlElement">
+		<xs:annotation>
+			<xs:documentation>Represents an XML element.  XmlElement's can contain XmlAttribute children 
+				and one other data element for the node value.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Block" minOccurs="0" />
+				<xs:element ref="Number" minOccurs="0" />
+				<xs:element ref="String" minOccurs="0" />
+				<xs:element ref="Flags" minOccurs="0" />
+				<xs:element ref="Blob" minOccurs="0" />
+				<xs:element ref="Padding" minOccurs="0" />
+				<xs:element ref="Seek" minOccurs="0" />
+				<xs:element ref="Choice" minOccurs="0" />
+				<xs:element ref="Custom" minOccurs="0" />
+				<xs:element ref="XmlElement" minOccurs="0" />
+				<xs:element ref="XmlAttribute" minOccurs="0" />
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="elementName" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ns">
+				<xs:annotation>
+					<xs:documentation>	XML Namespace of the element (optional)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="XmlAttribute">
+		<xs:annotation>
+			<xs:documentation>Represents an XML Attribute</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Block" minOccurs="0" />
+				<xs:element ref="Number" minOccurs="0" />
+				<xs:element ref="String" minOccurs="0" />
+				<xs:element ref="Flags" minOccurs="0" />
+				<xs:element ref="Blob" minOccurs="0" />
+				<xs:element ref="Padding" minOccurs="0" />
+				<xs:element ref="Seek" minOccurs="0" />
+				<xs:element ref="Choice" minOccurs="0" />
+				<xs:element ref="Custom" minOccurs="0" />
+				<xs:element ref="XmlElement" minOccurs="0" />
+				<xs:element ref="XmlAttribute" minOccurs="0" />
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="attributeName" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the attribute.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ns">
+				<xs:annotation>
+					<xs:documentation>	XML Namespace of the attribute (optional)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="String">
+		<xs:annotation>
+			<xs:documentation>A string of characters. This string element can represent both char and
+				wchar strings.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attribute name="type">
+				<xs:annotation>
+					<xs:documentation>Specify type of string. Default is char.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="ascii">
+							<xs:annotation>
+								<xs:documentation>Single byte characters</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="utf16">
+							<xs:annotation>
+								<xs:documentation>Double byte characters as commonly used with Windows
+								applications</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="utf16be">
+							<xs:annotation>
+								<xs:documentation>Multibyte unicode characters encoded in utf-16 big endian</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="utf32">
+							<xs:annotation>
+								<xs:documentation>Multibyte unicode characters encoded in utf-32</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="utf7">
+							<xs:annotation>
+								<xs:documentation>Multibyte unicode characters encoded in utf-7</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="utf8">
+							<xs:annotation>
+								<xs:documentation>Multibyte unicode characters encoded in utf-8</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="lengthType" type="tLengthType">
+				<xs:annotation>
+					<xs:documentation>An optional attribute that specifies the value of length.  Default is bytes.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="length" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specify static length of string. Default is
+						unbounded.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="tokens" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specify the set of tokens (as a Python array literal) that will be used to tokenize and fuzz this String. Example: &quot;[':', '.', '[' ]&quot;</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="nullTerminated" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicate if string is null terminated. Default is
+					false.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="token" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="padCharacter">
+				<xs:annotation>
+					<xs:documentation>Specify the character to bad the string with if it's length if less then
+						specified in the length attribute. Only valid when the length attribute is also
+						specified.  This field will accept python escape sequences
+						such as \xNN, \r, \n, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attributeGroup ref="ValueAttributes" />
+		</xs:complexType>
+		<xs:unique name="stringKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	
+	<xs:attributeGroup name="ValueAttributes">
+		<xs:attribute name="valueType">
+			<xs:annotation>
+				<xs:documentation>Format of value attribute.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="string">
+						<xs:annotation>
+							<xs:documentation>Regular string. C style &quot;\&quot; escaping can be used
+								such as: \r, \n, \t, and \\.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="literal">
+						<xs:annotation>
+							<xs:documentation>Treated as a python literal string. An example is
+								&quot;[1,2,3,4]&quot; which would evaluate to a python
+							list.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="hex">
+						<xs:annotation>
+							<xs:documentation>Hex string. Allows specifying binary data.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Default value of data element.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+	
+	<xs:group name="dataTypes">
+		<xs:choice>
+			<xs:element ref="Block" minOccurs="0" />
+			<xs:element ref="Number" minOccurs="0" />
+			<xs:element ref="String" minOccurs="0" />
+			<xs:element ref="Flags" minOccurs="0" />
+			<xs:element ref="Flag" minOccurs="0" />
+			<xs:element ref="Blob" minOccurs="0" />
+			<xs:element ref="Padding" minOccurs="0" />
+			<xs:element ref="Seek" minOccurs="0" />
+			<xs:element ref="Choice" minOccurs="0" />
+			<xs:element ref="Custom" minOccurs="0" />
+			<xs:element ref="XmlElement" minOccurs="0" />
+			<xs:element ref="XmlAttribute" minOccurs="0" />
+		</xs:choice>
+	</xs:group>
+	
+	<xs:attributeGroup name="peachCommonAttributes">
+		<xs:attribute name="name">
+			<xs:annotation>
+				<xs:documentation>Unique (to context) name for element. Names must not contain periods (.)
+					or spaces ( ).</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:annotation>
+						<xs:documentation>
+							This pattern only tests for whitespace.
+							Dots need to be tested for in the parser because they are valid when they are used in a reference.
+						</xs:documentation>
+					</xs:annotation>
+					<xs:pattern value="[\w\._#]+"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	
+	<xs:element name="Relation">
+		<xs:annotation>
+			<xs:documentation>Describes relations between different data elements. Relations currently
+				supported are "size" and "count".</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="type">
+				<xs:annotation>
+					<xs:documentation>Specify type or relation ship.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="size">
+							<xs:annotation>
+								<xs:documentation>A size relationship. A size relationship say be used in two ways.
+									First it can say "Size of another element". When used in this manor also use the
+									&quot;of&quot; attribute. Second it can say "Make me the size from another
+									element". In this case use the &quot;from&quot;
+								attribute.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="count">
+							<xs:annotation>
+								<xs:documentation>A count relationship. A count relationship can be used in two
+									ways. First it can say "Count of another element that has zero or more
+									occurrences". When used in this manor also use the &quot;of&quot;
+									attribute. Additionally the element specified must have minOccurs and/or maxOccurs
+									specified. Second it can say "Make me the count of another element." In this case
+									use the &quot;from&quot; attribute. Additionally the parent element of
+									this relationship must set minOccurs or maxOccurs.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<!--<xs:enumeration value="when">
+							<xs:annotation>
+								<xs:documentation>A when relationship says this element is only used if the expression 
+									in the &quot;when&quot; attribute evaulates to true.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>-->
+						<xs:enumeration value="offset">
+							<xs:annotation>
+								<xs:documentation>The position or offset from beginning of data that element of is located 
+									at.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="of" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Set size or count of this element. The parent of this relation ship will
+						determine the size or count of specified element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="from" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Get size or count from this element. The parent of this relationship
+						will be set to the size or count of the specified element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<!--<xs:attribute name="when" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>A python expression that must evaluate to true or false.  Only used
+						when type is when.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>-->
+			<xs:attribute name="expressionGet" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>An optional python expression that returns the value of count or length when we are
+						getting the parent based on the relation.  Special 
+						variables made available to the expression are: of -- the of reference, self -- The parent of this relation, 
+						count -- The count from parent, length -- the length from parent.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="expressionSet" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>An optional python expression that returns the value of count or length when we are 
+						setting the parent based on the relation.  Special 
+						variables made available to the expression are: of -- the of reference, self -- The parent of this relation, 
+						count -- The count from of ref, length -- the length from of ref.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="relative" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Offset relation is relative to current element.  Defaults to false.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="relativeTo" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Offset relation is relative to specified element.  Defaults to current element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Flags">
+		<xs:annotation>
+			<xs:documentation>Define a set of bit flags. Supports multiple bit flags.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="Flag" />
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attribute name="endian">
+				<xs:annotation>
+					<xs:documentation>Select byte order of little, network, or big.
+						Default is little.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="little" />
+						<xs:enumeration value="big" />
+						<xs:enumeration value="network" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="rightToLeft">
+				<xs:annotation>
+					<xs:documentation>After reading bits interpret them from right to left
+						instead of left to right.  This flag only applies when padding is
+						enabled.  The default for this attribute is false.  Note:
+						this should not be confused for setting endian byte order.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="true" />
+						<xs:enumeration value="false" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="padding">
+				<xs:annotation>
+					<xs:documentation>When padding is enabled, bytes/bits are read as if a
+						reading a structure.  See the 010 Editor documentation for "bitfields" for
+						a good discussion of how this affects reading of bits.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="true" />
+						<xs:enumeration value="false" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="size" type="xs:unsignedShort" use="required">
+				<xs:annotation>
+					<xs:documentation>Length in bits of this flag set. Valid values are 8, 16, 32, and
+						64.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+		</xs:complexType>
+		<xs:unique name="flagsKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+
+	<xs:attributeGroup name="peachNumberAttributes">
+		<xs:attribute name="signed" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Is number signed. Defaults to true.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="size" use="required">
+			<xs:annotation>
+				<xs:documentation>Size in bits of number. No default.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:unsignedShort">
+					<xs:maxInclusive value="64"/>
+					<xs:minInclusive value="1" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="endian">
+			<xs:annotation>
+				<xs:documentation>Specifies the byte order of this number. Defaults to
+				little.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="little" />
+					<xs:enumeration value="big" />
+					<xs:enumeration value="network" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	
+	<xs:element name="Flag">
+		<xs:annotation>
+			<xs:documentation>A one or more bit flag that is part of a flag set (Flags
+			element).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attribute name="position" type="xs:unsignedShort" use="required">
+				<xs:annotation>
+					<xs:documentation>Position of this flag start where the first bit is zero
+					(0).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="size" type="xs:unsignedShort" use="required">
+				<xs:annotation>
+					<xs:documentation>Size in bits of this flag. Must be at least 1 bit, and position+size
+						must be less then total length of Flag set.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attributeGroup ref="ValueAttributes" />
+			<xs:attribute name="token" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+		<xs:unique name="flagKey1">
+			<xs:selector xpath="." />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	
+	<xs:group name="peachCommonDataElements">
+		<xs:choice>
+			<xs:element ref="Relation" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="Transformer" minOccurs="0"  maxOccurs="1"/>
+			<xs:element ref="Fixup" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="Hint" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="Placement" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="Analyzer" minOccurs="0" maxOccurs="1"/>
+		</xs:choice>
+	</xs:group>
+	
+	<xs:element name="Data">
+		<xs:annotation>
+			<xs:documentation>Specified a set of default data values for a template.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Field">
+					<xs:annotation>
+						<xs:documentation>Specifies a value for a field in a template.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Name of field to specify a default value for. Format of name is
+									&quot;Element&quot; or
+								&quot;Block.Block.Element&quot;</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="valueType">
+							<xs:annotation>
+								<xs:documentation>Format of value attribute.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="string">
+										<xs:annotation>
+											<xs:documentation>Regular string. C style &quot;\&quot; escaping can be used
+												such as: \r, \n, \t, and \\.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value="literal">
+										<xs:annotation>
+											<xs:documentation>Treated as a python literal string. An example is
+												&quot;[1,2,3,4]&quot; which would evaluate to a python
+												list.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value="hex">
+										<xs:annotation>
+											<xs:documentation>Hex string. Allows specifying binary data.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="value" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Default value for template field.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attribute name="DataModel" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of template to create defaults for. Can include a namespace
+					prefix.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ref" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Base this element on another element as defined by this attribute.
+						Values are in "ns:parent.child.child" with the namespace optional. References are
+						resolved starting at the current context and walking up through parents to the root of
+						the document. In the case of a namespace prefix, resolution always starts at the
+						document root (the only place namespaces are defined).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="fileName" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Use contents of file to populate data model.  Peach will try and crack the file 
+						based on the data model.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="switchCount" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>If specifying multiple data files this attribute will control how often they are
+						switched.  Default is 100.  For files that take a long cracking time set to 1024 or larger.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="expression" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>A python expression that should return the data blob used to populate the data mode.
+						Peach will try and crack the data based on the data model.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="description" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Optional description of data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="tLengthType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="bits">
+				<xs:annotation>
+					<xs:documentation>Indicates the length is specified in units of bits.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bytes">
+				<xs:annotation>
+					<xs:documentation>Indicates the length is specified in units of bytes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="chars">
+				<xs:annotation>
+					<xs:documentation>Indicates the length is specified in units of characters.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="calc">
+				<xs:annotation>
+					<xs:documentation>
+						Indicates the length value is actually a scripting expression
+						that is evaluated to calculate the length value.  This expression will be evaluated
+						every time the length value is needed.  A special variable of "self" is available in the
+						expression which is the current object in the dom.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="Blob">
+		<xs:annotation>
+			<xs:documentation>A piece of binary data specified in hex.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attributeGroup ref="ValueAttributes" />
+			<xs:attribute name="token" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicates a token in the data stream.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="lengthType" type="tLengthType">
+				<xs:annotation>
+					<xs:documentation>An optional attribute that specifies the value of length.  Default is bytes.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="length" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>[Optional] Specify length of blob.  Default is unbounded.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="signed" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Is blob signed. Defaults to true.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Padding">
+		<xs:annotation>
+			<xs:documentation>Align a model/block with padding.  Will automatically pad to specified bit boundary, or provide an expression.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="peachCommonDataElements" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attributeGroup ref="ValueAttributes" />
+			<xs:attribute name="alignment" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Bit boundry to align to. Default is 8 bits (1 byte).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="alignedTo" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Align to a specific element.  Default is parent element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:attributeGroup name="commonTemplateAttributes">
+		<xs:attribute name="minOccurs" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The minimum number of times this element can occur. Setting this to zero
+					(0) indicates it is optional. The default value is one (1).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="maxOccurs" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The maximum number of times this element can occur. The default value is
+					one (1) except when minOccurs is defined in which case maxOccurs defaults to an
+					arbitrarily large number to indicate a "one/zero or many" concept. maxOccurs must be
+					larger or equal to minOccurs. When both minOccurs and maxOccurs are equal, that number of
+					elements will always be produced.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="occurs" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>The number of times this element can occur.  This is similar to setting both
+					minOccurs and maxOccurs to the same value.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="ref" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Base this element on another element as defined by this attribute. Values
+					are in "ns:parent.child.child" with the namespace optional. References are resolved
+					starting at the current context and walking up through parents to the root of the
+					document. In the case of a namespace prefix, resolution always starts at the document root
+					(the only place namespaces are defined).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="constraint" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Provide a python expression that will constrain the accepted value.  Expression
+					must evaulate to true or false.  The special variables 'self', and 'value' are available.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="mutable" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Is data elmement mutable (able to be changed).  Setting to false will cause this field
+					to not be fuzzed.  Default is true.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pointer" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Is data element wrapped in a pointer?  Default is false.  This attribute only applies when 
+					ctypes based publishers are in use.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pointerDepth" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>To what depth data element is wrapped in pointers (e.g. void** p is 2).  Defaults to 1.  This
+					attribute only applies when used with the pointer attribute.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+	
+	<xs:element name="Include">
+		<xs:annotation>
+			<xs:documentation>Imports other Peach XML files into a namespace. This allows reusing existing
+				templates from other Peach XML files.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="ns" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>The namespace prefix. One or more alphanumeric characters. Must not
+						include period.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="src" type="xs:anyURI" use="required">
+				<xs:annotation>
+					<xs:documentation>URL of file to include. For files say
+					"file:path_to_file"</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- TODO Finish creating Schema for the following elements -->
+	<xs:element name="PythonPath">
+		<xs:annotation>
+			<xs:documentation>Includes an additional path for module resolution. Synonymous with saying
+				"sys.path.append()".</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="path" use="required">
+				<xs:annotation>
+					<xs:documentation>Include this path when resolving python modules.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Import">
+		<xs:annotation>
+			<xs:documentation>Import a python file into the current context. This allows referencing
+				generators and methods in external python files. Synonomis with saying "import
+			xyz".</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="from">
+				<xs:annotation>
+					<xs:documentation>Just like the python &quot;from X import Y&quot;
+					syntax.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="import" use="required">
+				<xs:annotation>
+					<xs:documentation>Just like the python &quot;from X import Y&quot;
+					syntax.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<!--<xs:element name="Mutator">
+		<xs:annotation>
+			<xs:documentation>Includes a Mutator in this test.  Mutators provide methods for modifying templates and states to produce fuzzing cases.
+				If no Mutators are specified the default GeneratorMutator is used.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="class" use="required">
+				<xs:annotation>
+					<xs:documentation>Class name of the Mutator to use</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:union>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1024"/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="string.StringMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.XmlW3CMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.PathMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.HostnameMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.FilenameMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.StringCaseMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.UnicodeBomMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="string.UnicodeStringsMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="number.NumericalEdgeCaseMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="number.NumericalVarianceMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="number.FiniteRandomNumbersMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="blob.BitFlipperMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="blob.DWORDSliderMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="datatree.DataTreeRemoveMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="datatree.DataTreeDuplicateMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="datatree.DataTreeSwapNearNodesMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								
+								<xs:enumeration value="size.SizedVaranceMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="size.SizedNumericalEdgeCasesMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								
+								<xs:enumeration value="array.ArrayVarianceMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="array.ArrayNumericalEdgeCasesMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="array.ArrayReverseOrderMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="array.ArrayRandomizeOrderMutator">
+									<xs:annotation>
+										<xs:documentation></xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Mutators">
+		<xs:annotation>
+			<xs:documentation>Defines default mutators to use for testing.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="Mutator" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name for default mutators block.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>-->
+	
+	<xs:element name="Test">
+		<xs:annotation>
+			<xs:documentation>Define a test to run. Currently a test is defined as a combination of a
+				Template and optionally a Data set. In the future this will expand to include a state model,
+				defaults for generation, etc.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="Logger" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Specify a logging mechanism for fuzzing Run.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+						<xs:attribute name="class" use="required">
+							<xs:annotation>
+								<xs:documentation>
+									Specify the python class name of a Peach Logger class. You can
+									implement your own loggers as needed.
+								</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:union>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="1024" />
+										</xs:restriction>
+									</xs:simpleType>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="File">
+												<xs:annotation>
+													<xs:documentation>
+														Log to a path on the file system.  Requires a
+														single parameter named "Path" with the fully qualified path
+														place logged information.  This will include any data reported
+														by Agents and Monitors along with a text file containing
+														the sent and received data for each logged test.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:union>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="faultsOnly" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>
+									Should we only log faults or all tests performed?  Defaults to true.
+									Note: Setting this to false will cause large amounts of data to be logged and is
+									not recommended.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Include" type="tInclude"/>
+				<xs:element name="Exclude" type="tExclude"/>
+				<xs:element name="Mutators" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>
+							Specify applicable mutators to this test.  This is an optional element.
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="Mutator">
+								<xs:annotation>
+									<xs:documentation>Defines an individual mutator.</xs:documentation>
+								</xs:annotation>
+
+								<xs:complexType>
+									<xs:attribute name="class" use="required">
+										<xs:annotation>
+											<xs:documentation>The name of the mutator.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="1024" />
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+								</xs:complexType>
+
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="mode" use="required">
+							<xs:annotation>
+								<xs:documentation>Defines whether or not the mutator list is to be included or excluded.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:union>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="1024" />
+										</xs:restriction>
+									</xs:simpleType>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="include">
+												<xs:annotation>
+													<xs:documentation>
+														Include the specified mutators.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="exclude">
+												<xs:annotation>
+													<xs:documentation>
+														Exclude the specified mutators.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:union>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Strategy" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>
+							Select a fuzzing strategy for this Test.  This is an optional element, by default
+							the "sequential" fuzzing strategy is used.
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+							<xs:element ref="Param" />
+						</xs:sequence>
+						<xs:attribute name="class" use="required">
+							<xs:annotation>
+								<xs:documentation>Class name of Strategy to be used.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:union>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="1024"/>
+										</xs:restriction>
+									</xs:simpleType>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="RandomDeterministic">
+												<xs:annotation>
+													<xs:documentation>
+														This is the default strategy.  Each element will be mutated
+														using all mutators one at a time.  This strategy is deterministic and is
+														able to calculate the number of test cases it is capable of generating.  The order
+														is shuffled which sometimes makes it look random.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Sequential">
+												<xs:annotation>
+													<xs:documentation>
+														Each element will be mutated
+														using all mutators one at a time.  This strategy is deterministic and is
+														able to calculate the number of test cases it is capable of generating.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Random">
+												<xs:annotation>
+													<xs:documentation>
+														This strategy will select a random number of elements to
+														mutate on each iteration from 1 to 5.  Each selected element will have a
+														mutator selected at random and the mutator will be asked to produce a
+														value at random. This strategy will produce an infinite number of iterations
+														cases.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:union>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="StateModel" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Reference an already declared StateMachine using the 'ref' attribute.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="Path" minOccurs="1" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:choice minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="Include" type="tInclude"/>
+										<xs:element name="Exclude" type="tExclude"/>
+										<xs:element ref="Data"/>
+										<!--<xs:element ref="Mutator"/>-->
+									</xs:choice>
+									<xs:attribute name="ref" type="xs:string" use="required">
+										<xs:annotation>
+											<xs:documentation>Reference to an already declared state defined in the StateMachine</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Strategy" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>
+										A Strategy simply explores the state machine and finds a proper route 
+										passing through each Path(state) defined previous to itself. By default, if no explicit strategy
+										is declared, Static strategy will be used. It just assures that Peach fuzzes directly the given Paths(states)
+										(but this does not mean that it fuzzes only them! Remember to use Stop element ;)
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
+									</xs:sequence>
+									<xs:attribute name="class" use="required">
+										<xs:annotation>
+											<xs:documentation>Class name of Strategy to be used</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:union>
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:maxLength value="1024" />
+													</xs:restriction>
+												</xs:simpleType>
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:enumeration value="StaticStrategy">
+															<xs:annotation>
+																<xs:documentation>
+																	Default(implicit) strategy for Peach. It just follows the given Path definition.	
+																</xs:documentation>
+															</xs:annotation>
+														</xs:enumeration>
+														<xs:enumeration value="RandomStrategy">
+															<xs:annotation>
+																<xs:documentation>
+																	Randomly finds a route passing through the desired paths. 
+																	Use numOfSteps parameter(0 to unbounded) to set up maximum number of states in between
+																	start and destination paths as discovering the route.
+																</xs:documentation>
+															</xs:annotation>
+														</xs:enumeration>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:union>
+										</xs:simpleType>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Stop" minOccurs="0" maxOccurs="1"/>
+						</xs:choice>
+						<xs:attribute name="ref" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Reference to an already declared StateMachine.  Can include a namespace prefix (e.g. 'ns:FooMachine').</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+
+				<!--<xs:element ref="Mutator" minOccurs="0" maxOccurs="unbounded"/>-->
+				
+				<xs:element name="Agent" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Reference a defined agent to use with test .</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="ref" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>
+									Reference an element to use for this test. Values are in
+									"ns:parent.child.child" with the namespace being optional. Resolution always
+									starts at the document root.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="platform" use="optional">
+							<xs:annotation>
+								<xs:documentation>
+									Specify which platform this Agent is used for (defaults to Any).
+								</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:union>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="1024" />
+										</xs:restriction>
+									</xs:simpleType>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="None">
+												<xs:annotation>
+													<xs:documentation>
+														No platform (disabled)
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Windows">
+												<xs:annotation>
+													<xs:documentation>
+														Windows OS
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="OSX">
+												<xs:annotation>
+													<xs:documentation>
+														Apple OS X
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Linux">
+												<xs:annotation>
+													<xs:documentation>
+														Linux
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Unix">
+												<xs:annotation>
+													<xs:documentation>
+														Generic Unix
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Any">
+												<xs:annotation>
+													<xs:documentation>
+														Any platform
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:union>
+							</xs:simpleType>						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="Publisher" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Define the publisher to use for this test. A publisher sends and
+							receives data. This can take the form of a network protocol (TCP, UDP, HTTP) or
+							calling an API/DLL or COM control. For testing purposes there are publishers that will
+							simply output the generated data to the console.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+							<xs:element ref="Param" />
+						</xs:sequence>
+						<xs:attributeGroup ref="peachCommonAttributes" />
+						<xs:attribute name="class" use="required">
+							<xs:annotation>
+								<xs:documentation>Specify the python class name of a Peach publisher class. You can
+									implement your own publisher's as needed.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:union>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="1024" />
+										</xs:restriction>
+									</xs:simpleType>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="Tcp">
+												<xs:annotation>
+													<xs:documentation>Send tests to TCP port. Requires parameters named
+														&quot;Host&quot; and
+														&quot;Port&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="TcpListener">
+												<xs:annotation>
+													<xs:documentation>Accepts incoming connection on a TCP port. Requires parameters named
+														&quot;Host&quot; and
+														&quot;Port&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Udp">
+												<xs:annotation>
+													<xs:documentation>Send tests to UDP port. Requires parameters named
+														&quot;host&quot; and
+													&quot;port&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Console">
+												<xs:annotation>
+													<xs:documentation>Print tests to console. No
+													parameters.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="ConsoleHex">
+												<xs:annotation>
+													<xs:documentation>Print tests to console in hex and ASCII format. No
+													parameters.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>											
+											<xs:enumeration value="File">
+												<xs:annotation>
+													<xs:documentation>Read and Writes data from a file. Requires parameter named
+														&quot;FileName&quot;.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="FilePerIteration">
+												<xs:annotation>
+													<xs:documentation>Writes tests to a series of files. Requires parameter
+														named &quot;fileName&quot;. The value of this parameter must be
+														in format &quot;c:\path\file%d.ext&quot; where %d will become
+														the test count #.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Com">
+												<xs:annotation>
+													<xs:documentation>A simple COM publisher that will pass a test case as a
+														parameter to a single method call. Requires a parameters named
+														&quot;clsid&quot; and &quot;methodFormat&quot;. The
+														methodFormat parameter is in format:
+														FunctionName(&quot;%s&quot;) where %s will be replaced with the
+														test case.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Http">
+												<xs:annotation>
+													<xs:documentation>A simple COM publisher that will pass a test case as a
+														parameter to a single method call. Requires a parameters named
+														&quot;clsid&quot; and &quot;methodFormat&quot;. The
+														methodFormat parameter is in format:
+														FunctionName(&quot;%s&quot;) where %s will be replaced with the
+														test case.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="RawIPv4">
+												<xs:annotation>
+													<xs:documentation>Raw socket publisher for TCP v4.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="RawV4">
+												<xs:annotation>
+													<xs:documentation>Raw socket publisher for IPv4.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="RawV6">
+												<xs:annotation>
+													<xs:documentation>Raw socket publisher for IPv6.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="SerialPort">
+												<xs:annotation>
+													<xs:documentation>Serial Port publisher.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="WebService">
+												<xs:annotation>
+													<xs:documentation>Web Service (SOAP) publisher.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:union>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Name of test case</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="description" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Optional description of data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="waitTime" type="xs:decimal">
+				<xs:annotation>
+					<xs:documentation>
+						Time to wait in seconds between each iteration. Value can be fractional
+						(0.25). Defaults to zero (0).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="faultWaitTime" type="xs:decimal">
+				<xs:annotation>
+					<xs:documentation>
+						Time to wait in seconds between each iteration when in fault reproduction mode. 
+						This occurs when a fault has been detected and is being verified. Value can 
+						be fractional (0.25). Defaults to two (2) seconds.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="replayEnabled" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>
+						Should iterations be replayed when a fault occurs.  Defaults to 'true'.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="controlIteration" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>How often we should perform a control iteration.  Defaults to 0.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Param">
+		<xs:annotation>
+			<xs:documentation>Param elements provide parameters for the parent element. It is possible to
+				pass python types like arrays by specifying valueType as literal and providing python
+				literal as value. e.g. &quot;[ 1, 2, 3, 4 ]&quot; would be an
+			array.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" use="required">
+				<xs:annotation>
+					<xs:documentation>Parameter name.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="valueType">
+				<xs:annotation>
+					<xs:documentation>Format of value attribute.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="string">
+							<xs:annotation>
+								<xs:documentation>Regular string. C style &quot;\&quot; escaping can be used
+									such as: \r, \n, \t, and \\.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="literal">
+							<xs:annotation>
+								<xs:documentation>Treated as a python literal string. An example is
+									&quot;[1,2,3,4]&quot; which would evaluate to a python
+								list.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="hex">
+							<xs:annotation>
+								<xs:documentation>Hex string. Allows specifying binary data.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="ref">
+							<xs:annotation>
+								<xs:documentation>Only valid for Param elements that are children of Generator elements.
+									Specify the name of another element here and that elements Generator will get passed
+									in as this argument.  Usefull when building a Generator to provide a custom checksum
+									type field.  See IcmpChecksum and BlockSize as examples.  GeneratorReference.xml is
+									and example XML that uses this feature.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="value" use="required">
+				<xs:annotation>
+					<xs:documentation>Value of parameter.  By default value attribute is a python string literal.  This means &quot;\n&quot; 
+						and &quot;\r&quot; will evaluate as in Python.  This also means backslashes (\) need to be escaped.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Hint">
+		<xs:annotation>
+			<xs:documentation>Hints provide additional information about data elements that are used by 
+				mutators to better target the elements value.  Examples of hints might be indicating the type
+				is really XML.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name">
+				<xs:annotation>
+					<xs:documentation>Name of Hint</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:union>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1024"/>
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="type">
+									<xs:annotation>
+										<xs:documentation>Provide a hint about content type.  Examples of values are: 
+											xml, filename, path, unc, url, ipv4addr, ipv6addr, hostname, domainname, 
+											etc.  See mutators for list of hints they operate on.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="related">
+									<xs:annotation>
+										<xs:documentation>Provide a hint about related data elements.  Value is a 
+											comma separated list of other elements.  Values that are seen as related could
+											be fuzzed together.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="value">
+				<xs:annotation>
+					<xs:documentation>Value of hint.  Examples: xml, filename, path, unc, url, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Transformer">
+		<xs:annotation>
+			<xs:documentation>Transform data into another format. This can include encoding it in some way
+				(base64), compressing it (gzip), etc.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0">
+				<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Transformer" minOccurs="0" maxOccurs="1" />
+			</xs:choice>
+			<xs:attribute name="class">
+				<xs:annotation>
+					<xs:documentation>Specify the python class name of a Peach transformer class. You can
+						implement your own transformers as needed.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:union>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1024" />
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="GzipCompress">
+									<xs:annotation>
+										<xs:documentation>Gzip compression</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="GzipDecompress">
+									<xs:annotation>
+										<xs:documentation>Gzip decompression </xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Bz2Compress">
+									<xs:annotation>
+										<xs:documentation>bzip2 compression</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Bz2Decompress">
+									<xs:annotation>
+										<xs:documentation>bzip2 decompression </xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Crypt">
+									<xs:annotation>
+										<xs:documentation>UNIX style crypt. Optional parameter with name of
+											&quot;salt&quot; can be used to specify the crypt salt
+											value.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="UnixMd5Crypt">
+									<xs:annotation>
+										<xs:documentation>UNIX style MD5 crypt. Optional parameters with names of
+											&quot;salt&quot; and &quot;magic&quot; can be
+											specified.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="ApacheMd5Crypt">
+									<xs:annotation>
+										<xs:documentation>Apache style MD5 crypt. Optional parameter with name of
+											&quot;salt&quot; can be specified.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="CvsScramble">
+									<xs:annotation>
+										<xs:documentation>CVS pserver password scramble</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Md5">
+									<xs:annotation>
+										<xs:documentation>MD5 transform (binary)</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Sha1">
+									<xs:annotation>
+										<xs:documentation>SHA-1 transform (binary)</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Hmac">
+									<xs:annotation>
+										<xs:documentation>HMAC as described in RFC 2104. A required parameter of name
+											&quot;key&quot; is needed. Additionally an optional parameter of
+											&quot;digestmod&quot; can be specified with a value of md5 or
+											sha.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SidStringToBytes">
+									<xs:annotation>
+										<xs:documentation>Convert a string representation SID to a byte
+											form.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="UrlEncode">
+									<xs:annotation>
+										<xs:documentation>URL encode w/o pluses.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="NetBiosDecode">
+									<xs:annotation>
+										<xs:documentation>NetBiosName Decode</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="NetBiosEncode">
+									<xs:annotation>
+										<xs:documentation>NetBiosName Encoded</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="UrlEncodePlus">
+									<xs:annotation>
+										<xs:documentation>URL encode with spaces turned to pluses</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Base64Encode">
+									<xs:annotation>
+										<xs:documentation>Base64 encode.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Base64Decode">
+									<xs:annotation>
+										<xs:documentation>Base64 decode.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="HtmlEncodeAgressive">
+									<xs:annotation>
+										<xs:documentation>Perform aggressive HTML encoding.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="HtmlEncode">
+									<xs:annotation>
+										<xs:documentation>Perform standard HTML encoding of &gt; &lt; &amp;
+											and &quot;</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="HtmlDecode">
+									<xs:annotation>
+										<xs:documentation>Decode HTML encoded string</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Ipv4StringToOctet">
+									<xs:annotation>
+										<xs:documentation>Convert a dot notation IPV4 address into a 4 byte octect
+											representation.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Ipv4StringToNetworkOctet">
+									<xs:annotation>
+										<xs:documentation>Convert a dot notation IPV4 address into a 4 byte octect
+											representation.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Ipv6StringToOctet">
+									<xs:annotation>
+										<xs:documentation>Convert a collen notation IPV6 address into a 4 byte octect
+											representation.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Hex">
+									<xs:annotation>
+										<xs:documentation>Transforms a number into a hex string (10 becomes A).</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="HexString">
+									<xs:annotation>
+										<xs:documentation>Transforms a string of bytes into the specified Hex
+											format.  Example: "22"  becomes "32 32", "A" becomes "42".</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Fixup">
+		<xs:annotation>
+			<xs:documentation>
+				Transform data into another format. This can include encoding it in some way
+				(base64), compressing it (gzip), etc.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+			<xs:attribute name="class">
+				<xs:annotation>
+					<xs:documentation>
+						Specify the python class name of a Peach Fixup class. You can
+						implement your own fixups as needed.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:union>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1024" />
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="MD5Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard MD5</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SHA1Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA1</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SHA224Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA224</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SHA256Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA256</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SHA384Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA384</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SHA512Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard SHA512</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Crc32Fixup">
+									<xs:annotation>
+										<xs:documentation>Standard CRC32 as defined in ISO 3309.  Used by PNG, ZIP, etc.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="Crc32DualFixup">
+									<xs:annotation>
+										<xs:documentation>
+											Standard CRC32 as defined in ISO 3309.  This version takes
+											two ref arguments and will calculate the first CRC32 and then add the 2nd.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="EthernetChecksumFixup">
+									<xs:annotation>
+										<xs:documentation>Ethernet Checksum</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="IcmpChecksumFixup">
+									<xs:annotation>
+										<xs:documentation>ICMP Checksum</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="IcmpV6ChecksumFixup">
+									<xs:annotation>
+										<xs:documentation>ICMP v6 Checksum</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="LRCFixup">
+									<xs:annotation>
+										<xs:documentation>LRC Checksum</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="TCPChecksumFixup">
+									<xs:annotation>
+										<xs:documentation>TCP Checksum</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="UDPChecksumFixup">
+									<xs:annotation>
+										<xs:documentation>UDP Checksum</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SequenceIncrementFixup">
+									<xs:annotation>
+										<xs:documentation>
+											Allows a field to emit a sequential value without adding additional test cases. This is useful for sequence numbers common in network protocols.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="SequenceRandomFixup">
+									<xs:annotation>
+										<xs:documentation>
+											Allows a field to emit a random value without adding additional test cases. This is useful for sequence numbers common in network protocols.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="ExpressionFixup">
+									<xs:annotation>
+										<xs:documentation>
+											Run a scripting expression to generate fixup data.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="ScriptFixup">
+									<xs:annotation>
+										<xs:documentation>
+											Use a scripting implemented fixup.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+								<xs:enumeration value="HMAC">
+									<xs:annotation>
+										<xs:documentation>
+											Standard HMAC.  Requires key, hashtype, and length in bytes to return.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Custom">
+		<xs:annotation>
+			<xs:documentation>A custom data type for use in data models.  Requires custom python
+				code that implements parsing, cracking, and generation of data.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any />
+			</xs:choice>
+			
+			<xs:attributeGroup ref="peachCommonAttributes" />
+			<xs:attributeGroup ref="commonTemplateAttributes" />
+			<xs:attribute name="class">
+				<xs:annotation>
+					<xs:documentation>Specify the python class name of a Peach Custom class. You can
+						implement your own custom types as needed.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1024" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Placement">
+		<xs:annotation>
+			<xs:documentation>Indicate to the data cracker (parser) were this node should live after data is parsed into it.
+				the only use for this element is when dealing with files that contain offset changes that must be parsed via
+				a Data element or input/getprop state action.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="after" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specifies the element that this element should occur after.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="before" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Indicates this element should occur before the specified element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Analyzer">
+		<xs:annotation>
+			<xs:documentation>Call an analyzer to build out part of the DOM.  Parameters are passed using Param element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="class" use="required">
+				<xs:annotation>
+					<xs:documentation>Full class name of the Analyzer to use.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Binary">
+							<xs:annotation>
+								<xs:documentation>Break up binary data by identifying strings and basic relations.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="StringToken">
+							<xs:annotation>
+								<xs:documentation>Break up a string using a list of puncuation typically used as tokens in ascii based parsable strings.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="Xml">
+							<xs:annotation>
+								<xs:documentation>Convert a String containing XML into XmlElement and XmlAttribute data elements.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="StateModel">
+		<xs:annotation>
+			<xs:documentation>Defines a state machine to use during a fuzzing test.  State machines in Peach are intended to be
+				fairly simple and allow for only the basic modeling typically required for fuzzing state aware protocols or 
+				call sequences.  State machines are made up of one or more States which are in them selves make up of
+				one or more Action.  As Actions are executed the data can be moved between them as needed.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="State" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>The State element defines a sequence of Actions to perform.  Actions can cause a 
+							change to another State.  Such changes can occur dynamically based on content received or sent
+							by attaching python expressions to actions via the onStart/onComplete/when attributes.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="Action" minOccurs="1" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Defines an action to perform in this state.  Actions are things such as send 
+										output, receive input, or change state.  Actions are performed top down.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:choice minOccurs="0" maxOccurs="unbounded">
+										<xs:element ref="DataModel" maxOccurs="1"/>
+											<!--<xs:complexType>
+												<xs:attribute name="name" type="xs:string"/>
+												<xs:attribute name="ref" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>Reference an element to use for this test. Values are in
+															"ns:parent.child.child" with the namespace being optional. Resolution always
+															starts at the document root.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>-->
+										<xs:element ref="Data" maxOccurs="1" minOccurs="0" />
+										<xs:element name="Ocl" maxOccurs="1" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Provide an OCL script or reference existing context.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name="context" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>Reference existing OCL Context</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Param" minOccurs="0" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Define a parameter for call.  Parameters are passed in the order they appear.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:choice minOccurs="1" maxOccurs="unbounded">
+													<xs:element name="DataModel" maxOccurs="1" minOccurs="1">
+														<xs:complexType>
+															<xs:attribute name="ref" type="xs:string">
+																<xs:annotation>
+																	<xs:documentation>Reference a Template element to use for this test. Values are in
+																		"ns:parent.child.child" with the namespace being optional. Resolution always
+																		starts at the document root.</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="Data" maxOccurs="1" minOccurs="0" />
+												</xs:choice>
+												<xs:attribute name="name" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>Name of this Action</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="type">
+													<xs:annotation>
+														<xs:documentation>The type of action this is.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:enumeration value="in">
+																<xs:annotation>
+																	<xs:documentation>In parameter</xs:documentation>
+																</xs:annotation>
+															</xs:enumeration>
+															<xs:enumeration value="out">
+																<xs:annotation>
+																	<xs:documentation>Out parameter</xs:documentation>
+																</xs:annotation>
+															</xs:enumeration>
+															<xs:enumeration value="inout">
+																<xs:annotation>
+																	<xs:documentation>In and Out parameter</xs:documentation>
+																</xs:annotation>
+															</xs:enumeration>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Result" minOccurs="0" maxOccurs="1">
+											<xs:annotation>
+												<xs:documentation>Used to capture return value of call.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:choice minOccurs="1" maxOccurs="unbounded">
+													<xs:element name="DataModel" maxOccurs="1" minOccurs="1">
+														<xs:complexType>
+															<xs:attribute name="ref" type="xs:string">
+																<xs:annotation>
+																	<xs:documentation>Reference a Template element to use for this test. Values are in
+																		"ns:parent.child.child" with the namespace being optional. Resolution always
+																		starts at the document root.</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+												</xs:choice>
+												<xs:attribute name="name" type="xs:string">
+													<xs:annotation>
+														<xs:documentation>Name of this Action</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>												
+											</xs:complexType>
+										</xs:element>
+									</xs:choice>
+									<!-- Attributes for Action -->
+									<xs:attribute name="name" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Name of this Action</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="ref" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Reference to another State.  Only used when type is changeState.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="method" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Metod to invoke.  Only used when type is call.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="property" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Property to invoke.  Only used when type is setProperty or getProperty.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="setXpath" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>xpath expression that will return one or more nodes to modify defaultValue of.  Only used when type is xpath.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="valueXpath" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>xpath expression that finds a single node to get a value from.  Only used when type is xpath.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<!--<xs:attribute name="value" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>value to set on setXpath nodes.  Only used when type is xpath.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>-->
+									<xs:attribute name="when" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Python expression that will be evaluated before this Action is performed.  If the 
+												expression evaluates to true the action will be performed otherwise it will be skipped.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="publisher" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Name of publisher to use. If not specified it defaults to first declared publisher.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="onStart" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>A python expression that will be evaluated at the start of this Action being performed.  It is
+												evaluated after the when expression (if present) is evaluated.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="onComplete" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>A python expression that will be evaluated after the Action has been performed.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="type">
+										<xs:annotation>
+											<xs:documentation>The type of action this is.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:enumeration value="input">
+													<xs:annotation>
+														<xs:documentation>Receive data</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="output">
+													<xs:annotation>
+														<xs:documentation>Send data</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="changeState">
+													<xs:annotation>
+														<xs:documentation>Change to another state specified by the ref attribute.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="call">
+													<xs:annotation>
+														<xs:documentation>Perform a call using specified parameters.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="getProperty">
+													<xs:annotation>
+														<xs:documentation>Get value from property.  Not all publishers support this (COM does).  Requires a Result child element.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="setProperty">
+													<xs:annotation>
+														<xs:documentation>Set value for property.  Not all publishers support this (COM does). Requires a single Param of type in.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="slurp">
+													<xs:annotation>
+														<xs:documentation>Evaluate an xpath expression against an XML DOM of the State Machine object model.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="start">
+													<xs:annotation>
+														<xs:documentation>Start a publisher.  Must be first action for a publisher.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="stop">
+													<xs:annotation>
+														<xs:documentation>Stop a publisher.  Must be last action for a publisher.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="connect">
+													<xs:annotation>
+														<xs:documentation>Cause publisher to make a connection (if supported).  This is also synonymous with open.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="open">
+													<xs:annotation>
+														<xs:documentation>Cause publisher to perform an open operation (if supported).  This is also synonymous with connect.</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="accept">
+													<xs:annotation>
+														<xs:documentation>Cause publisher to accept an incoming connection (if supported).</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+												<xs:enumeration value="close">
+													<xs:annotation>
+														<xs:documentation>Cause publisher to close a connection (outgoing or incoming if supported).</xs:documentation>
+													</xs:annotation>
+												</xs:enumeration>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+						<!-- Attributes for State -->
+						<xs:attribute name="name" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Name of state</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="onEnter" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>A python expression that is evaluated on the start of this states execution.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="onExit" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>A python expression that is evaluated on the end of this states execution.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<!-- Attributes for StateMachine -->
+			<xs:attribute name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of state machine</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="initialState" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the state to execute first.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Agent">
+		<xs:annotation>
+			<xs:documentation>Configure a local or remote agent. Agents can perform various tasks during
+				a fuzzing run. This element must include at least one Monitor child.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="PythonPath" />
+				<xs:element ref="Import" />
+				
+				<xs:element name="Monitor" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Monitors are agent modules that can perform a number of tasks such as
+							monitoring a target application to detect faults, restarting virtual machines,
+							recording network traffic, etc. Custom monitors can easily be created and used along
+							with the included monitors.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+						<xs:attribute name="name" type="xs:string" >
+							<xs:annotation>
+								<xs:documentation>Name of monitor.  Will be used when logging monitor information.  Default is GUID.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="class" use="required">
+							<xs:annotation>
+								<xs:documentation>Specify the python class name of a Peach Monitor class. You can
+									implement your own monitors as needed.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:union>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="1024" />
+										</xs:restriction>
+									</xs:simpleType>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="CanaKitRelay">
+												<xs:annotation>
+													<xs:documentation>
+														Monitor to control the Cana Kit Relay board.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="CleanupFolder">
+												<xs:annotation>
+													<xs:documentation>
+														Remove all files from specified folder.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="CrashReporter">
+												<xs:annotation>
+													<xs:documentation>
+														Use OS X Crash Reporter facilities to collect faults.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="CrashWrangler">
+												<xs:annotation>
+													<xs:documentation>
+														Use OS X Crash Wrangler library to detect faults and collect bucketing
+														information.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="IpPower9258">
+												<xs:annotation>
+													<xs:documentation>
+														Control IP Power 9258, networked power strip.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Ping">
+												<xs:annotation>
+													<xs:documentation>
+														Ping a remote host. Can trigger fault on no response.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="ProcessKiller">
+												<xs:annotation>
+													<xs:documentation>
+														Kill a process.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="SaveFile">
+												<xs:annotation>
+													<xs:documentation>
+														File to save when a fault is triggered.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="SshDownloader">
+												<xs:annotation>
+													<xs:documentation>
+														Download a file or folder via SSH.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="WindowsDebugger">
+												<xs:annotation>
+													<xs:documentation>
+														Windows WinDbg agent. This debugger agent is based on
+														the windbg engine and supports the following features: User mode
+														debugging, Kernel mode debugging, x86 and x64, Symbols and symbol
+														server.   To use WinDBG *must* be installed.  One of the following three
+														parameters are required: CommandLine, ProcessName, or KernelConnectionString.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="PopupWatcher">
+												<xs:annotation>
+													<xs:documentation>Monitors for windows that contain a specific string.  Multiple
+														copies of this monitor can run at once.  When a window with the specified string
+														pops-up it can be closed, or trigger a fault.  Valid paramters are as follows:
+														CloseWindows (bool) indicate if Window should be closed; TriggerFaults (bool)
+														indicate if Window should trigger a fault; WindowNames (comma separated string)
+														a list of Window names to look for.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Vmware">
+												<xs:annotation>
+													<xs:documentation>Control a vmware server instance to start/revert the
+														target vm. Two parameters are required of &quot;host&quot; and
+														&quot;vmx&quot;. The host parameter specifies the hostname or ip
+														address of the vmware server. The vmx parameter gives the location of
+														the .vmx file of the VM to use.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="PageHeap">
+												<xs:annotation>
+													<xs:documentation>
+														Enables PageHeap for an executable on the start of a test and then 
+														disables it after the test has run.  A required parameter of &quot;Executable&quot;
+														is required.  This is filename NOT including path (notepad.exe).  An
+														optional parameter of &quot;Path&quot; can be supplied to provide
+														the path for the Microsoft Debugging Tools for Windows (windbg).
+														If not specified the default install location on the C parition is used.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Process">
+												<xs:annotation>
+													<xs:documentation>Process control agent. This agent is able to start,
+														stop, and monitor if a process is running. If the process exits early a
+														fault will be issued to the fuzzer. Requires a parameter of
+														&quot;Command&quot; that specifies the full command line to be
+														run. Optional boolean parameters of
+														&quot;RestartOnEachTest&quot; (defaults to false) and
+														&quot;FaultOnEarlyExit&quot; (defaults to true) can also be
+														specified.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Pcap">
+												<xs:annotation>
+													<xs:documentation>Monitor and capture network traffic using PCAP library.
+														Capture is restart for each test. In event of a fault the capture file
+														is kept for further analysis.</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Socket">
+												<xs:annotation>
+													<xs:documentation>Monitors a given socket for connections. Issues a fault 
+														when a connection is made to the specified socket.
+														Capture is restart for each test. OnFault it will return the IP and
+														port of the connecting client. Accepts three parameters: &quot;IP&quot;,
+														&quot;Port&quot;, and &quot;Protocol&quot;. IP defaults to &quot;127.0.0.1&quot;,
+														Port defaults to &quot;8002&quot;, and Protocol defaults to &quot;tcp&quot;.
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+											<xs:enumeration value="Memory">
+												<xs:annotation>
+													<xs:documentation>Monitors the memory consumption of a given process.
+														Accepts the following parameters: StopOnFault, MemoryLimit, Pid, and
+														ProcessName. MemoryLimit and either Pid or ProcessName are required.
+														If set, StopOnFault must be set to &quot;True&quot; or &quot;False&quot;.
+														MemoryLimit is specified in bytes. Specify ProcessName without the file
+														extension. i.e &quot;calc.exe&quot; becomes &quot;calc&quot;
+													</xs:documentation>
+												</xs:annotation>
+											</xs:enumeration>
+
+
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:union>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Name of agent. May not contain spaces or periods (.).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="password" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Password to the remote agent if needed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="location">
+				<xs:annotation>
+					<xs:documentation>Specify location of agent. Value is &quot;LocalAgent&quot; or the
+						hostname/ipaddress of the agent (defaults to LocalAgent)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:union>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1024" />
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="local">
+									<xs:annotation>
+										<xs:documentation>Special location type that will cause the Peach Engine to
+											automatically create an agent running locally.</xs:documentation>
+									</xs:annotation>
+								</xs:enumeration>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>	
+</xs:schema>
+
+<!-- END -->

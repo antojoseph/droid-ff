@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<DataModel name="TheModel">
+		<String value="querystring?key1=value1&amp;key2=value+2">
+			<Analyzer class="StringToken" />
+		</String>
+	</DataModel>
+
+	<StateModel name="State" initialState="State1" >
+		<State name="State1">
+			<Action type="output">
+				<DataModel ref="TheModel"/>
+			</Action>
+		</State>
+	</StateModel>
+
+	<Test name="Default">
+		<StateModel ref="State"/>
+		<Publisher class="Console" />
+	</Test>
+
+</Peach>
+<!-- end -->

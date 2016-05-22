@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+	
+	<!-- 
+		
+		Example of fuzzing Safari on OS X using CrashWrangler to detect faults.
+		
+		You will need to download and build CrashWrangler from the Apple developers
+		site.  Google for "CrashWrangler" for link.  You will need to update the paths
+		setup in this file to match your configuration.
+		
+		Syntax:
+		
+			peach samples\DebuggerCrashWrangler.xml
+		
+		Output:
+		
+			You will see Safari start and stop as it is fuzzed.
+		
+		Authors:
+		
+			Michael Eddington (mike@dejavusecurity.com)
+		
+	-->
+
+	<DataModel name="TheDataModel">
+		<Blob />
+	</DataModel>
+	
+	<!--
+		In this state model notice that every Action specifies the Publisher
+		to use.  This is because multiple Publishers have been defined in
+		the Test section.  If only one Publisher was in use we would not
+		have todo this.
+	-->
+	<StateModel name="TheState" initialState="Initial">
+		<State name="Initial">
+			
+			<!-- First we will write the file out and close it -->
+			
+			<Action type="output">
+				<DataModel ref="TheDataModel"/>
+				<Data fileName="samples" />
+			</Action>
+			
+			<Action type="close" />
+			
+			<!-- Next we will launch the target process -->
+
+			<Action type="call" method="ScoobySnacks" publisher="Peach.Agent"/>
+		</State>
+	</StateModel>
+
+	<!--
+		Agents on OS X must always specify the location attribute.  Additionally
+		you will need to start up an agent process by running "peach -a".
+	-->
+	<Agent name="LocalAgent">
+		
+		<!--
+			CrashWrangler will open the program for us while monitoring it for crashes.
+			Because we are file fuzzing we must also configure it to only start
+			when we tell it to from the StateModel via a "call" Action.  We will
+			do this using the "StartOnCall" parameter.  If you were testing a
+			network service then you would not use the "StartOnCall"
+			parameter.
+		-->
+		<Monitor class="CrashWrangler">
+			<Param name="Command" value="/Applications/Safari.app/Contents/MacOS/Safari" />
+			<Param name="Arguments" value="fuzzed.bin" />
+			
+			<Param name="UseDebugMalloc" value="false" />
+			<Param name="ExploitableReads" value="true" />
+			<Param name="ExecHandler" value="./exc_handler" />
+			
+			<Param name="StartOnCall" value="ScoobySnacks" />
+		</Monitor>
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="LocalAgent"/>
+		<StateModel ref="TheState"/>
+		
+		<!-- 
+			We are going to configure two Publishers.  The first
+			Publisher will beable to write a file to disk and the
+			second publisher will cause our target to be launched.
+		-->
+		
+		<!-- This publisher will write our file. -->
+		<Publisher class="File">
+			<Param name="FileName" value="fuzzed.bin"/>
+		</Publisher>
+		
+		<!-- To enable logging we must include this -->
+		<Logger class="Filesystem">
+			<Param name="Path" value="logs"/>
+		</Logger>
+	</Test>
+
+</Peach>
+<!-- end -->

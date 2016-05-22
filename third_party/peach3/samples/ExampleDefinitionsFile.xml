@@ -1,0 +1,38 @@
+﻿<PitDefines>
+	
+	<!-- 
+	
+	A definitions XML file can contain multiple 
+	sets of key value pairs.
+	
+	A definition can be associated with a specific
+	platform by using the platform attribute.
+	
+	-->
+	
+	<!-- Definitions that are not platform dependent -->
+	<Defines>
+		<Define key="LOGPATH" value="logs" />
+	</Defines>
+	
+	<!-- Definitions for windows only -->
+	<Defines platform="windows">
+		<Define key="IPADDRESS" value="127.0.0.1" />
+		<Define key="PORT" value="600" />
+		<Define key="MACHINENAME" value="foobar" />
+	</Defines>
+	
+	<!-- Definitions for OS X only -->
+	<Defines platform="osx">
+		<Define key="IPADDRESS" value="127.0.0.1" />
+		<Define key="PORT" value="600" />
+		<Define key="MACHINENAME" value="foobar" />
+	</Defines>
+	
+	<!-- Definitions for Linux only -->
+	<Defines platform="linux">
+		<Define key="IPADDRESS" value="127.0.0.1" />
+		<Define key="PORT" value="600" />
+		<Define key="MACHINENAME" value="foobar" />
+	</Defines>
+</PitDefines>

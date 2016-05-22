@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<!--
+
+	Demonstraits the "count" data relation.
+	
+	Syntax:
+	
+      peach samples\RelationCount.xml
+	
+	Authors:
+	  Michael Eddington (mike@dejavusecurity.com)
+	
+	-->
+
+	<!-- Create a simple data template containing a single string -->
+	<DataModel name="RelationCountTemplate">
+
+		<String value="Count of hello worlds is " />
+		<String >
+			<Relation type="count" of="HelloWorld" />
+		</String>
+		<String value="\n" />
+		<String name="HelloWorld" minOccurs="5" maxOccurs="10" value="Hello World! " />
+
+	</DataModel>
+
+	<StateModel name="TheState" initialState="FirstState">
+		<State name="FirstState">
+			<Action type="output">
+				<DataModel ref="RelationCountTemplate" />
+			</Action>
+		</State>
+	</StateModel>
+
+	<!-- Out tests set will contain this single test -->
+	<Test name="Default">
+		<StateModel ref="TheState"/>
+		<!-- Display test cases to the console -->
+		<Publisher class="Console" />
+	</Test>
+
+</Peach>
+<!-- end -->

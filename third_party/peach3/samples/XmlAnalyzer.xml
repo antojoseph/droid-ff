@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<DataModel name="XmlModel">
+		<String value="&lt;Root&gt;
+			&lt;Element1 attrib1=&quot;Attrib1Value&quot; /&gt;&lt;/Root&gt;">
+			<Analyzer class="Xml" />
+		</String>
+	</DataModel>
+
+	<StateModel name="State" initialState="State1" >
+		<State name="State1"  >
+			<Action type="output" >
+				<DataModel ref="XmlModel"/>
+			</Action>
+		</State>
+	</StateModel>
+
+	<Test name="Default">
+		<StateModel ref="State"/>
+		<Publisher class="Console" />
+	</Test>
+
+</Peach>
+<!-- end -->

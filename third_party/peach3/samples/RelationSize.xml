@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<!--
+
+	Demonstraits the "size" data relation.
+	
+	Syntax:
+	
+      peach samples\RelationSize.xml 
+	  
+	Authors:
+	  Michael Eddington (mike@dejavusecurity.com)
+	
+	-->
+
+	<!-- Create a simple data template containing a single string -->
+	<DataModel name="RelationSizeTemplate">
+
+		<String value="Length of following string is: " />
+		
+		<String>
+			<Relation type="size" of="HelloWorld" />
+		</String>
+		
+		<String value="\n" />
+		
+		<String name="HelloWorld" value="Hello World!" />
+
+	</DataModel>
+	
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+			<Action type="output">
+				<DataModel ref="RelationSizeTemplate" />
+			</Action>
+		</State>
+	</StateModel>
+	
+	<Test name="Default">
+		<StateModel ref="State" />
+		<Publisher class="Console" />
+	</Test>
+</Peach>
+
+<!-- end -->

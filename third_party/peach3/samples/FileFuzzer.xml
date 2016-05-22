@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+	
+	<!--
+		
+		Example of the WindowsDebugger monitor.  This example will launch a 
+		program with an attached debugger and log stack traces on faults.  The
+		included example program will fault on test 47.
+		
+		Syntax:
+		
+			peach samples\Debugger.xml
+		
+		Output:
+		
+			You will see the tests scroll along.  Once test 47 has occured you can check
+			the c:\peach\logfiles folder for a log of this test that will include a Debugger.txt
+			faul output.
+			
+			NOTE: The crashing test can varry by version of Peach.
+		
+		Authors:
+		
+			Michael Eddington (mike@dejavusecurity.com)
+		
+		$Id$
+		
+	-->
+	
+	<!-- Define our file format DDL -->
+	<DataModel name="TestTemplate">
+		<String value="Hello World!" />
+	</DataModel>
+	
+	<!-- Define a simple state machine that will write the file and 
+		then launch a program using the FileWriter and DebuggerLaucher publishers -->
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+			
+			<!-- Write out contents of file.  The publisher attribute matches 
+			the name we provide for the publisher in the Test section. -->
+			<Action type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+			
+			<!-- Close file -->
+			<Action type="close" />
+			
+			<!-- Launch the file consumer -->
+			<Action type="call" method="ScoobySnacks" publisher="Peach.Agent"/>
+			
+		</State>
+	</StateModel>
+	
+	<!-- Setup a local agent that will monitor for faults -->
+	<Agent name="LocalAgent">
+		<Monitor class="WindowsDebugger">
+			
+			<!-- The command line to run.  Notice the filename provided matched up 
+				to what is provided below in the Publisher configuration -->
+			<Param name="CommandLine" value="c:\windows\system32\notepad.exe fuzzfile.bin" />
+			
+			<!-- This parameter will cause the debugger to wait for an action-call in
+				the state model with a method="ScoobySnacks" before running
+				program.
+				
+				Note: You will also need to add a parameter to the publisher called
+				    "debugger" and set it to "true"!
+				-->
+			<Param name="StartOnCall" value="ScoobySnacks" />
+			
+		</Monitor>
+		
+		<!-- Enable heap debugging on our process as well. -->
+ 		<Monitor class="PageHeap">
+			<Param name="Executable" value="notepad.exe"/>
+		</Monitor>
+	</Agent>
+	
+	<Test name="Default">
+		<Agent ref="LocalAgent" />
+		<StateModel ref="State"/>
+		
+		<!-- Configure our publisher with correct filename to write too -->
+		<Publisher class="File">
+			<Param name="FileName" value="fuzzfile.bin" />
+		</Publisher>
+
+		<!-- Configure a logger to store collected information -->
+		<Logger class="Filesystem">
+			<Param name="Path" value="logtest" />
+		</Logger>
+	</Test>
+	
+</Peach>
+<!-- end -->

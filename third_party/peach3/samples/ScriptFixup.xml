@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach /peach3/peach.core/peach.xsd">
+
+	<!--
+
+	Example of using Python or Ruby to implement a Fixup
+	
+	Syntax:
+	
+	  peach samples\ScriptFixup.xml
+	  
+	Output:
+	
+	  This example will display all each test case to the console, you should see lots of test data
+	  scroll along.  This example should only take a couple minutes to complete.
+	
+	Authors:
+	  Michael Eddington (mike@dejavusecurity.com)
+	
+	-->
+
+	<Import import="fixup" />
+
+	<!-- Create a simple data template containing a single string -->
+	<DataModel name="TheDataModel">
+		<String value="Hello World!">
+			<Fixup class="ScriptFixup">
+				<Param name="class" value="fixup.FixupReturningString"/>
+				<Param name="ref" value="TheDataModel" />
+			</Fixup>
+		</String>
+
+		<Blob value="Crazy blob value">
+			<Fixup class="ScriptFixup">
+				<Param name="class" value="fixup.FixupReturningByteArray"/>
+				<Param name="ref" value="TheDataModel" />
+			</Fixup>
+		</Blob>
+	</DataModel>
+
+	<StateModel name="State" initialState="State1" >
+		<State name="State1"  >
+			<Action type="output" >
+				<DataModel ref="TheDataModel"/>
+			</Action>
+		</State>
+	</StateModel>
+
+	<Test name="Default">
+		<StateModel ref="State"/>
+		<Publisher class="Console" />
+	</Test>
+</Peach>
+<!-- end -->

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>/Users/dd/peach-slave/osx_release/build/slag/osx_release/Peach.Core.Test/Peach.Core.Test</name>
+    </assembly>
+    <members>
+        <member name="M:Peach.Core.Test.CrackingTests.ArrayTests.CrackArrayStopAtMax">
+            <summary>
+            We should stop cracking at maxOccurs.  Question, should we throw an exception or just
+            stop?
+            </summary>
+        </member>
+        <member name="M:Peach.Core.Test.ReportedTests.ObjectCopierExplode">
+            <summary>
+            From Sirus.
+            </summary>
+            <remarks>
+            input data attached.   For some reason stalls in the ObjectCopier clone method
+            trying to deserialze a 120 megabyte (!) memory stream of a Dom.Number... Wonder
+            what the heck the serializer is doing..
+            </remarks>
+        </member>
+        <member name="M:Peach.Core.Test.ReportedTests.CrackExplode">
+            <summary>
+            Reported by Sirus
+            </summary>
+        </member>
+        <member name="M:Peach.Core.Test.ReportedTests.CrackNoExplode">
+            <summary>
+            Proper data bytes for model of CrackExplode
+            </summary>
+        </member>
+        <member name="M:Peach.Core.Test.ReportedTests.CrackExplode2">
+            <summary>
+            Reported by Sirus
+            </summary>
+        </member>
+    </members>
+</doc>

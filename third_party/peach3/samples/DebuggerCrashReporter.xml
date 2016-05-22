@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<!--
+		
+		Example of the OS X Crash Reporter monitor.  This example will use the OS X
+		Crash Repoter functionality to detect faults.
+		
+		Syntax:
+		
+		  peach samples\DebuggerCrashReporter.xml
+				
+		Authors:
+		
+		  Michael Eddington (mike@dejavusecurity.com)
+		
+	-->
+
+	<DataModel name="TestTemplate">
+		<String name="TheString" value="Hello World!" />
+	</DataModel>
+
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+			<Action name="SendValue1" type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+		</State>
+	</StateModel>
+
+	<Agent name="LocalAgent">
+		<Monitor class="Process">
+			<Param name="Executable" value="CrashableServer" />
+			<Param name="Arguments" value="127.0.0.1 4242" />
+		</Monitor>
+		<Monitor class="CrashReporter" />
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="LocalAgent" />
+
+		<StateModel ref="State"/>
+		<Publisher class="Tcp">
+			<Param name="Host" value="127.0.0.1" />
+			<Param name="Port" value="4242" />
+		</Publisher>
+	</Test>
+
+</Peach>
+<!-- end -->

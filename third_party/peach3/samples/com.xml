@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<DataModel name="TheDataModel">
+		<String value="Hello World!" />
+	</DataModel>
+
+	<DataModel name="TheDataModelNumber">
+		<String value="100" />
+	</DataModel>
+
+	<StateModel name="TheState" initialState="Initial">
+
+		<State name="Initial">
+			<Action type="call" method="Method1">
+				<Param name="arg1">
+					<DataModel ref="TheDataModel" />
+				</Param>
+			</Action>
+			
+			<!-- TODO - Capture result -->
+			<Action type="call" method="Method2">
+			</Action>
+
+			<Action type="call" method="Method3">
+				<Param name="arg1">
+					<DataModel ref="TheDataModel" />
+				</Param>
+			</Action>
+
+			<!-- CRASH -->
+			<Action type="call" method="Method4"/>
+			<Action type="call" method="Method4"/>
+
+			<Action type="call" method="Method2"/>
+			<Action type="call" method="Method2"/>
+			<Action type="call" method="Method2"/>
+			<Action type="call" method="Method2"/>
+
+			<Action type="call" method="Method4"/>
+
+			<Action type="call" method="Method5">
+				<Param name="arg1">
+					<DataModel ref="TheDataModelNumber" />
+				</Param>
+				<Param name="arg2">
+					<DataModel ref="TheDataModelNumber" />
+				</Param>
+			</Action>
+
+			<Action type="call" method="Method6">
+				<Param name="arg1">
+					<DataModel ref="TheDataModelNumber" />
+				</Param>
+				<Param name="arg2">
+					<DataModel ref="TheDataModelNumber" />
+				</Param>
+			</Action>
+
+			<Action type="getProperty" property="Property1">
+				<DataModel ref="TheDataModel" />
+			</Action>
+
+			<Action type="setProperty" property="Property1">
+				<DataModel ref="TheDataModel" />
+			</Action>
+		</State>
+
+	</StateModel>
+
+	<Agent name="MyAgent">
+		<Monitor class="WindowsDebugger">
+			<Param name="CommandLine" value="Peach.Core.ComContainer.exe" />
+			<!--<Param name="WinDbgPath" value="C:\Program Files (x86)\Debugging Tools for Windows (x86)"/>-->
+		</Monitor>
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="MyAgent"/>
+		<StateModel ref="TheState"/>
+		
+		<Publisher class="Com">
+			<Param name="clsid" value="{8FAEEEE1-AAA5-4B77-8CBA-BFDCE3E3C7E8}"/>
+		</Publisher>
+		
+		<Logger class="Filesystem">
+			<Param name="Path" value="Logs" />
+		</Logger>
+	</Test>
+
+</Peach>
+<!-- end -->

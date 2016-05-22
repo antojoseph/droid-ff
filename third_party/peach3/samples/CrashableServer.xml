@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<!--
+		
+		Example of the fault bucketing.  This example will launch a 
+		program with an attached debugger and log stack traces on faults.
+		
+		Syntax:
+		
+		  peach.exe samples\CrashableServer.xml
+		
+		Output:
+		
+		  You will see the tests scroll along.
+		  Faults should occur quite often.
+		
+	-->
+
+	<DataModel name="TestTemplate">
+		<String name="TheString" value="Hello World!" />
+	</DataModel>
+
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+
+			<Action name="SendValue1" type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+
+			<Action name="SendValue2" type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+
+		</State>
+	</StateModel>
+
+	<Agent name="LinAgent">
+		<Monitor class="LinuxDebugger">
+			<Param name="Executable" value="./CrashableServer" />
+			<Param name="Arguments" value="127.0.0.1 4244" />
+			<!--<Param name="GdbPath" value="/path/to/gdb" />-->
+		</Monitor>
+	</Agent>
+
+	<Agent name="OsxAgent">
+		<Monitor class="CrashWrangler">
+			<Param name="Command" value="./CrashableServer" />
+			<Param name="Arguments" value="127.0.0.1 4244" />
+
+			<Param name="UseDebugMalloc" value="true" />
+			<Param name="ExploitableReads" value="true" />
+			<!--<Param name="ExecHandler" value="/path/to/exc_handler" />-->
+		</Monitor>
+	</Agent>
+
+	<Agent name="WinAgent">
+		<Monitor class="WindowsDebugger">
+			<Param name="CommandLine" value="CrashableServer.exe 127.0.0.1 4244" />
+			<!--<Param name="WinDbgPath" value="C:\Program Files (x86)\Debugging Tools for Windows (x86)" />-->
+		</Monitor>
+		<Monitor class="PageHeap">
+			<Param name="Executable" value="CrashableServer.exe"/>
+			<!--<Param name="WinDbgPath" value="C:\Program Files (x86)\Debugging Tools for Windows (x86)" />-->
+		</Monitor>
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="LinAgent" platform="linux"/>
+		<Agent ref="OsxAgent" platform="osx"/>
+		<Agent ref="WinAgent" platform="windows"/>
+
+		<StateModel ref="State"/>
+		<Publisher class="Tcp">
+			<Param name="Host" value="127.0.0.1" />
+			<Param name="Port" value="4244" />
+		</Publisher>
+		<Logger class="Filesystem">
+			<Param name="Path" value="Logs" />
+		</Logger>
+	</Test>
+</Peach>
+<!-- end -->

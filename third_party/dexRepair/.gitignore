@@ -1,0 +1,6 @@
+src/*.o
+src/dexRepair
+obj
+libs
+bin/*
+nbproject

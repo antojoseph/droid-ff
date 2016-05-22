@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>/Users/dd/peach-slave/osx_release/build/slag/osx_release/Peach.Core.OS.OSX/Peach.Core.OS.OSX</name>
+    </assembly>
+    <members>
+        <member name="T:Peach.Core.Agent.Monitors.CrashReporter">
+            <summary>
+            Monitor will use OS X's built in CrashReporter (similar to watson)
+            to detect and report crashes.
+            </summary>
+        </member>
+        <member name="T:Peach.Core.Agent.Monitors.CrashWrangler">
+            <summary>
+            Monitor will use OS X's built in CrashReporter (similar to watson)
+            to detect and report crashes.
+            </summary>
+        </member>
+    </members>
+</doc>

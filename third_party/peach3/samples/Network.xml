@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<!--
+		
+	Example of the Network monitor.  This example requires two machines.
+		
+	The included example program will fault on test 47.
+		
+	Configure:
+		
+		Change 192.168.1.195 to IP of second machine.
+		
+	Syntax:
+		
+		2nd machine: peach -a tcp
+		1st machine: peach samples\Debugger.xml
+		
+	Output:
+		
+		You will see the tests scroll along.  Once test 47 has occured you can check
+		the "Logs" folder for a log of this test that will include a Debugger.txt
+		and Network.pcap faul output.
+		
+	Authors:
+		
+		Michael Eddington (mike@dejavusecurity.com)
+		
+	-->
+
+	<DataModel name="HttpRequest">
+		<String value="Hello World!" />
+	</DataModel>
+	
+	<StateModel name="TheStateModel" initialState="TheState">
+		<State name="TheState">
+			<Action type="output">
+				<DataModel ref="HttpRequest" />
+			</Action>
+		</State>
+	</StateModel>
+
+	<!-- Agents that run localy will be started automatically by Peach -->
+	<Agent name="RemoteAgent" location="tcp://192.168.1.190:9001">
+		<Monitor name="Debugger" class="WindowsDebugger">
+			<Param name="CommandLine" value="CrashableServer.exe 192.168.1.190 4242"/>
+		</Monitor>
+
+		<Monitor name="Network" class="PcapMonitor">
+			<Param name="filter" value="tcp"/>
+		</Monitor>
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="RemoteAgent" />
+		<StateModel ref="TheStateModel"/>
+
+		<Publisher class="TcpClient">
+			<Param name="Host" value="192.168.1.190" />
+			<Param name="Port" value="4242" />
+		</Publisher>
+		
+		<Logger class="Filesystem">
+			<Param name="Path" value="Logs" />
+		</Logger>
+	</Test>
+
+</Peach>
+<!-- end -->

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach xmlns="http://peachfuzzer.com/2012/Peach" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://peachfuzzer.com/2012/Peach ../peach.xsd">
+
+	<!--
+		
+		Example of the WindowsDebugger monitor.  This example will launch a 
+		program with an attached debugger and log stack traces on faults.  The
+		included example program will fault on test 47.
+		
+		Syntax:
+		
+		  peach.exe samples\Debugger.xml
+		
+		Output:
+		
+		  You will see the tests scroll along.  Once test 47 has occured you can check
+		  the Logs folder for a log of this test.
+		
+		Authors:
+		
+		  Michael Eddington (mike@dejavusecurity.com)
+		
+	-->
+
+	<DataModel name="TestTemplate">
+		<String name="TheString" value="Hello World!" />
+	</DataModel>
+
+	<StateModel name="State" initialState="Initial">
+		<State name="Initial">
+
+			<Action name="SendValue1" type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+			
+			<Action name="SendValue2" type="output">
+				<DataModel ref="TestTemplate" />
+			</Action>
+			
+		</State>
+	</StateModel>
+
+	<Agent name="LocalAgent">
+		<Monitor class="LinuxDebugger">
+			<Param name="Executable" value="./CrashableServer" />
+			<Param name="Arguments" value="127.0.0.1 4244" />
+		</Monitor>
+	</Agent>
+
+	<Test name="Default">
+		<Agent ref="LocalAgent" />
+
+		<StateModel ref="State"/>
+		<Publisher class="Tcp">
+			<Param name="Host" value="127.0.0.1" />
+			<Param name="Port" value="4244" />
+		</Publisher>
+		<Logger class="Filesystem">
+			<Param name="Path" value="Logs" />
+		</Logger>
+	</Test>
+</Peach>
+<!-- end -->

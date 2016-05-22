@@ -1,0 +1,7 @@
+.idea
+*.pyc
+.DS_Store
+generated_samples_folder
+crashes
+confirmed_crashes
+
