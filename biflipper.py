@@ -1,6 +1,7 @@
 from pyZZUF import *
 import os.path
 import threading
+import fuzzerConfig
 
 
 def test_flipping():
@@ -28,7 +29,7 @@ def thread_it(fuzz_range_start, fuzz_range_end, number_of_samples, data_to_be_fl
         # zzuf.set_fuzz_bytes([[0, 3], [6, EOF]])
         # Fuzzing mode <mode> ([xor] set unset)
         zzuf.set_fuzz_mode(FUZZ_MODE_XOR)
-        with open("generated_samples_folder/" + "sample" + str(x) + "-" + str(fuzz_range_start) + "-" + str(
+        with open(fuzzerConfig.path_to_generated_samples + "sample" + str(x) + "-" + str(fuzz_range_start) + "-" + str(
                 fuzz_range_end) + extension, 'wb') as output:
             output.write(zzuf.mutate())
 
@@ -36,7 +37,7 @@ def thread_it(fuzz_range_start, fuzz_range_end, number_of_samples, data_to_be_fl
 def flipp():
     # sample_path = raw_input("Provide path to a sample file :")
     # only for testing, uncomment in prod
-    sample_path = "mutation_sample/sample.dex"
+    sample_path = fuzzerConfig.path_to_mutation_sample+"sample.dex"
     num_sample = raw_input("Provide the number of Samples to be Generated : ")
     # make threading dynamic , for now sticking to 4 threads
     # number_of_threads = raw_input("Number of Threads to be used :")

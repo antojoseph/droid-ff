@@ -13,6 +13,7 @@ path_to_generated_samples = USR_HOME_DIR+"/droid-ff/generated_samples_folder/"
 path_to_save_logcat= USR_HOME_DIR+"/droid-ff/logcat.txt"
 path_to_dex_fixer = USR_HOME_DIR+"/droid-ff/bin/dexRepair"
 path_to_mutated_dex = USR_HOME_DIR+"/droid-ff/generated_samples_folder/"
+path_to_mutation_sample = USR_HOME_DIR+"/droid-ff/mutation_sample/"
 
 #android binary which needs to be fuzzed
 target_android_executable = "/system/xbin/dexdump"
