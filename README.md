@@ -1,7 +1,9 @@
 # Droid-FF : 
 
-install python dependencies (setup.sh ) and you are good to go
-run the android emulator
+install python dependencies (setup.sh ) and you are good to go.
+
+run the android emulator.
+
 run python droif-ff.py
 
 
