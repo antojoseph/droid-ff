@@ -14,6 +14,12 @@ def draw_line():
         sys.stdout.write('... ')
     print "\n"
 
+
+def move_unique_crash(filename):
+	full_file_path = fuzzerConfig.path_for_crash_samples+filename[10:]
+        args = ("cp", full_file_path,fuzzerConfig.path_to_unique_crashes)
+        execute = subprocess.Popen(args, stdout=subprocess.PIPE)
+
 def find_base_module(filename):
     tombstone = fuzzerConfig.path_for_confirmed_samples + filename
 
@@ -88,3 +94,4 @@ def start():
         for line in execute1.stdout.readlines():
             print line[:-1]
         draw_line()
+	move_unique_crash(filename)

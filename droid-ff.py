@@ -5,6 +5,8 @@ import run_campaign
 import collect_crashes
 import parse_tombstone
 import triage
+import start_gdb
+
 def welcome_banner():
     banner.horizontal("DroiD-FF")
 
@@ -16,7 +18,7 @@ def error():
 
 
 def show_options():
-    options = ['(0) Generate Files', '(1) Start running fuzzer', '(2) View Crashes', '(3) Triage Crashes','(4) View Source of Crashes']
+    options = ['(0) Generate Files', '(1) Start running fuzzer', '(2) View Crashes', '(3) Triage Crashes','(4) View Source of Crashes','(5) Exploitability Test']
 
     for x in range(len(options)):
         print "     " + options[x]
@@ -37,6 +39,8 @@ def show_options():
                 triage.start()
             elif int(user_selection) ==4 :
                 parse_tombstone.start()
+            elif int(user_selection)== 5 :
+		start_gdb.start()
 
 
 
