@@ -2,6 +2,10 @@
 
 install python dependencies (setup.sh ) and you are good to go.
 
+GDB Server for android :  get it from @ wget https://people.mozilla.org/~nchen/jimdb/jimdb-arm-linux_x64.tar.bz2 
+Credits to @ https://wiki.mozilla.org/Mobile/Fennec/Android/GDB
+
+
 run the android emulator.
 
 run python droif-ff.py
