@@ -3,8 +3,10 @@ import os
 
 
 def radamsa_do(sample_path,extension,num_sample):
-    for x in range(0,int(num_sample)):
-        os.system(fuzzerConfig.path_to_fuzzer_binaries+"radamsa "+sample_path+" -o "+fuzzerConfig.path_to_generated_samples+"sample"+str(x)+extension)
+    cmd = fuzzerConfig.path_to_fuzzer_binaries + "radamsa " \
+            + sample_path + " -o " + fuzzerConfig.path_to_generated_samples + \
+            "sample%n" + extension + " -n " + str(num_sample)
+    os.system(cmd)
 
     print "done"
 
