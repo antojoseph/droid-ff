@@ -16,8 +16,8 @@ def start():
         #collect the crash
         result = adb_android.shell("ls -l /data/tombstones/ | grep tombstone_00")
 
-        if(len(result)<2):
-            pass
+        if(len(result[1]) < 2):
             #No Tombstones generated , its a false positive
-        else:
-            adb_android.pull('/data/tombstones/tombstone_00',fuzzerConfig.path_for_confirmed_samples+"tombstone_"+onlyfiles[x])
+            continue
+            
+        adb_android.pull('/data/tombstones/tombstone_00', fuzzerConfig.path_for_confirmed_samples + "tombstone_" + onlyfiles[x])

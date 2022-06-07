@@ -11,7 +11,6 @@ def radamsa_do(sample_path,extension,num_sample):
     print "done"
 
 def start():
-    print "hi"
     # sample_path = raw_input("Provide path to a sample file :")
     # only for testing, uncomment in prod
     sample_path = fuzzerConfig.path_to_mutation_sample+"sample.dex"

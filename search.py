@@ -20,19 +20,13 @@ def process(filename):
     lines = f.readlines()
 
     #parse every line of the current log
-    print "Total Number  of lines" +str(len(lines))
+    print "Total Number of lines " +str(len(lines))
     for x in range(0, len(lines)):
 
             strings = ("SIGSEGV", "SIGSEGV", "SIGFPE","SIGILL")
-            if any(s in lines[x] for s in strings):
+            if any(s in lines[x - offset_line_to_file] for s in strings):
               if "F/libc" in lines[x]:
                 if "F/CRASH_LOGGER" in lines[x - offset_line_to_file]:
                     new_crashes.append(lines[x - offset_line_to_file][32:].strip())
 
     move_crashes_to_triage()
-
-
-
-            
-            #run triage and process tombstone files
-            #have a beer :)

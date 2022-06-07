@@ -5,3 +5,7 @@ generated_samples_folder
 crashes
 confirmed_crashes
 
+.vscode/launch.json
+.vscode/settings.json
+logcat.txt
+unique_crashes

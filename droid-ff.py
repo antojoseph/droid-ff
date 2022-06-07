@@ -6,6 +6,7 @@ import collect_crashes
 import parse_tombstone
 import triage
 import start_gdb
+import rm_data
 
 def welcome_banner():
     banner.horizontal("DroiD-FF")
@@ -18,7 +19,7 @@ def error():
 
 
 def show_options():
-    options = ['(0) Generate Files', '(1) Start running fuzzer', '(2) View Crashes', '(3) Triage Crashes','(4) View Source of Crashes','(5) Exploitability Test']
+    options = ['(0) Generate Files', '(1) Start running fuzzer', '(2) View Crashes', '(3) Triage Crashes','(4) View Source of Crashes','(5) Exploitability Test', '(6) Delete generated files']
 
     for x in range(len(options)):
         print "     " + options[x]
@@ -31,18 +32,18 @@ def show_options():
             print "Your Option is : " + options[int(user_selection)]
             if int(user_selection) == 0:
                 gen_data.fuzzer_options()
-            elif int(user_selection) ==1 :
+            elif int(user_selection) == 1 :
                 run_campaign.start()
-            elif int(user_selection) ==2 :
+            elif int(user_selection) == 2 :
                 collect_crashes.start()
-            elif int(user_selection) ==3 :
+            elif int(user_selection) == 3 :
                 triage.start()
-            elif int(user_selection) ==4 :
+            elif int(user_selection) == 4 :
                 parse_tombstone.start()
-            elif int(user_selection)== 5 :
-		start_gdb.start()
-
-
+            elif int(user_selection) == 5 :
+		        start_gdb.start()
+            elif int(user_selection) == 6 :
+                rm_data.start()
 
     except ValueError:
         error()
